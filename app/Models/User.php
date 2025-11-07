@@ -6,6 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\{
+    UserAchievement,
+    UserItem,
+    Friend,
+    QuestParticipant,
+    ParticipantTask,
+    SocialActivity
+};
 
 class User extends Authenticatable
 {
@@ -18,9 +26,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'exp',
+        'level',
+        'points',
+        'avatar_id',
+        'avatar_frame_id'
     ];
 
     /**
@@ -29,6 +42,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
+        'id',
         'password',
         'remember_token',
     ];
@@ -44,5 +58,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function userAchievement() {
+        return $this->hasMany(UserAchievement::class);
+    }
+
+    public function userItem() {
+        return $this->hasMany(UserItem::class);
+    }
+
+    public function questParticipant() {
+        return $this->hasMany(QuestParticipant::class);
+    }
+
+    public function participantTask() {
+        return $this->hasMany(ParticipantTask::class);
+    }
+
+    public function socialActivity() {
+        return $this->hasMany(SocialActivity::class);
+    }
+
+    public function friend() {
+        return $this->hasMany(Friend::class);
     }
 }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('friends', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('friend_id');
+            $table->foreign('friend_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->enum('status', ['pending_request', 'friend', 'blocked'])->default('pending_request');
             $table->timestamps();
         });
     }

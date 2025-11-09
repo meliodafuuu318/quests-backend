@@ -3,6 +3,10 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\{
+    User,
+    Quest
+};
 
 return new class extends Migration
 {
@@ -13,6 +17,10 @@ return new class extends Migration
     {
         Schema::create('quest_participants', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Quest::class)->constrained()->cascadeOnDelete();
+            $table->datetime('joined_at');
+            $table->datetime('completed_at')->nullable();
             $table->timestamps();
         });
     }

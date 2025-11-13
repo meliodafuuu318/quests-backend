@@ -14,7 +14,6 @@ class Achievement extends Model
         'name',
         'description',
         'exp_reward',
-        'icon',
     ];
 
     protected $hidden = [

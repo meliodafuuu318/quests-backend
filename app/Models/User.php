@@ -14,11 +14,12 @@ use App\Models\{
     ParticipantTask,
     SocialActivity
 };
+use Climactic\Credits\Traits\HasCredits;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, hasCredits;
 
     /**
      * The attributes that are mass assignable.
@@ -31,7 +32,6 @@ class User extends Authenticatable
         'password',
         'exp',
         'level',
-        'points',
         'avatar_id',
         'avatar_frame_id'
     ];

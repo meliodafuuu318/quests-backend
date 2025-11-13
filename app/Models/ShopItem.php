@@ -13,7 +13,7 @@ class ShopItem extends Model
         'name',
         'type',
         'price',
-        'asset'
+        // 'asset_id'
     ];
     
     protected $hidden = [

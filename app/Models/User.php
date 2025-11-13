@@ -32,8 +32,8 @@ class User extends Authenticatable
         'password',
         'exp',
         'level',
-        'avatar_id',
-        'avatar_frame_id'
+        // 'avatar_id',
+        // 'avatar_frame_id'
     ];
 
     /**

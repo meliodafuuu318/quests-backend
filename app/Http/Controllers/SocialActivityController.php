@@ -9,5 +9,31 @@ use App\Models\{
 
 class SocialActivityController extends Controller
 {
-    //
+    public function createPost() {
+        //
+    }
+
+    public function updatePost() {
+        //
+    }
+
+    public function deletePost() {
+        //
+    }
+
+    public function createComment() {
+        //
+    }
+
+    public function updateComment() {
+        //
+    }
+
+    public function deleteComment() {
+        //
+    }
+
+    public function react() {
+        //
+    }
 }

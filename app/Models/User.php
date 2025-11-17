@@ -15,11 +15,12 @@ use App\Models\{
     SocialActivity
 };
 use Climactic\Credits\Traits\HasCredits;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, hasCredits;
+    use HasFactory, Notifiable, hasCredits, hasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -32,6 +33,8 @@ class User extends Authenticatable
         'password',
         'exp',
         'level',
+        'first_name',
+        'last_name',
         // 'avatar_id',
         // 'avatar_frame_id'
     ];

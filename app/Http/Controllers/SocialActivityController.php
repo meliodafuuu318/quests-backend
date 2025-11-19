@@ -40,12 +40,4 @@ class SocialActivityController extends Controller
     public function indexPosts() {
         //
     }
-
-    public function indexComments() {
-        //
-    }
-
-    public function indexReacts() {
-        //
-    }
 }

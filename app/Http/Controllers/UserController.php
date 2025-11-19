@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use App\Models\{
     User
+};
+use App\Requests\User\{
+    EditAccountInfoRequest
 };
 
 class UserController extends Controller
@@ -20,8 +24,15 @@ class UserController extends Controller
         return $this->success('User info fetched successfully', $user, 200);
     }
 
-    public function editAccountInfo() {
-        //
+    public function editAccountInfo(EditAccountInfoRequest $request) {
+        DB::beginTransaction();
+        try {
+            DB::commit();
+            return 0;
+        } catch (\Exception $e) {
+            DB::rollback();
+            return 0;
+        }
     }
 
     public function indexUsers() {

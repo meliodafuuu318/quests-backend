@@ -16,11 +16,12 @@ use App\Models\{
 };
 use Climactic\Credits\Traits\HasCredits;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, hasCredits, hasApiTokens;
+    use HasFactory, Notifiable, hasCredits, hasApiTokens, hasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +36,13 @@ class User extends Authenticatable
         'level',
         'first_name',
         'last_name',
+        'birthdate',
+        'gender',
+        'city',
+        'province',
+        'country',
+        'contact_number',
+        'bio',
         // 'avatar_id',
         // 'avatar_frame_id'
     ];
@@ -48,6 +56,9 @@ class User extends Authenticatable
         'id',
         'password',
         'remember_token',
+        'email_verified_at',
+        'created_at',
+        'updated_at'
     ];
 
     /**

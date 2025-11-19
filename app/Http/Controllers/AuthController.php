@@ -15,7 +15,7 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request) {
-        if ($request->filled(['username', 'email', 'password', 'firstName', 'lastName'])) {
+        if ($request->filled(['username', 'email', 'password', 'firstName', 'lastName', 'role'])) {
             DB::beginTransaction();
 
             try {
@@ -26,6 +26,8 @@ class AuthController extends Controller
                     'first_name' => $request->firstName,
                     'last_name' => $request->lastName,
                 ]);
+
+                $newUser->assignRole($request->role);
 
                 DB::commit();
 

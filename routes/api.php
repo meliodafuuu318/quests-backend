@@ -26,4 +26,6 @@ Route::group([
     $route->get('/account-info', [UserController::class, 'getAccountInfo']);
     $route->put('/account-info', [UserController::class, 'editAccountInfo']);
     $route->get('/', [UserController::class, 'indexUsers']);
+    $route->get('/search', [UserController::class, 'searchUsers']);
+    $route->get('/show', [UserController::class, 'showUser']);
 });

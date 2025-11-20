@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\{
-    User
+    User,
+    Friend
 };
 use App\Http\Requests\User\{
     EditAccountInfoRequest
@@ -54,17 +55,54 @@ class UserController extends Controller
         }
     }
 
-    public function indexUsers(Request $request) {
+    public function indexUsers() {
+        $user = User::find(auth()->user()->id);
+
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        $friendIds = Friend::where('user_id', $user->id)
+            ->pluck('friend_id')
+            ->merge(
+                Friend::where('friend_id', $user->id)->pluck('user_id')
+            )
+            ->unique()
+            ->values();
+
+        $mutualIds = Friend::whereIn('user_id', $friendIds)
+            ->orWhereIn('friend_id', $friendIds)
+            ->get()
+            ->flatMap(function ($friend) {
+                return [$friend->user_id, $friend->friend_id];
+            })
+            ->unique()
+            ->reject(fn ($id) => $id == auth()->id())
+            ->reject(fn ($id) => $friendIds->contains($id))
+            ->values();
+
+        $recommended = User::whereIn('id', $mutualIds)
+            ->get();
+            // ->paginate(10);
+
+        $transformedRecommended = $recommended->map(function ($rec) {
+            return [
+                'username' => $rec->username,
+                'firstName' => $rec->first_name,
+                'lastName' => $rec->last_name,
+            ];
+        });
+
+        return $this->success('Recommended friends fetched successfully.', $transformedRecommended, 200);
+    }
+
+    public function searchUsers(Request $request) {
         $query = User::query();
 
-        if ($request->filled('username')) {
-            $query->where('username', 'like', '%' . $request->username . '%');
-        }
-        if ($request->filled('firstName')) {
-            $query->where('first_name', 'like', '%' . $request->firstName . '%');
-        }
-        if ($request->filled('lastName')) {
-            $query->where('last_name', 'like', '%' . $request->lastName . '%');
+        if ($request->filled('name')) {
+            $query->where('username', 'like', '%' . $request->name . '%')
+                ->orwhere('first_name', 'like', '%' . $request->name . '%')
+                ->orwhere('last_name', 'like', '%' . $request->name . '%');
         }
         $filteredUsers = $query->get();
         $transformedUsers = $filteredUsers->map(function ($user) {
@@ -78,11 +116,25 @@ class UserController extends Controller
         return $this->success('Users fetched successfully', $transformedUsers, 200);
     }
 
-    public function showUser() {
-        //
+    public function showUser(Request $request) {
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        return $this->success('User details fetched successfully', $user, 200);
     }
 
     public function indexUserPosts() {
+        //
+    }
+
+    public function sendFriendRequest() {
+        //
+    }
+
+    public function acceptFriendRequest() {
         //
     }
 }

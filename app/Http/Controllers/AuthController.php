@@ -31,14 +31,14 @@ class AuthController extends Controller
 
                 DB::commit();
 
-                return $this->success('User created successfully', $newUser);
+                return $this->success('User created successfully', $newUser, 200);
 
             } catch (\Exception $e) {
                 DB::rollback();
-                return $this->error('User creation failed');
+                return $this->error('User creation failed', 500, $e);
             }
         } else {
-            return $this->error('Incomplete credentials');
+            return $this->error('Incomplete credentials', 400);
         }
     }
 
@@ -46,7 +46,7 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (!auth()->attempt($credentials)) {
-            return $this->error('Invalid login credentials');
+            return $this->error('Invalid login credentials', 400);
         }
 
         $user = auth()->user();
@@ -62,7 +62,7 @@ class AuthController extends Controller
         return $this->success('Login successful', [
             'token' => $token, 
             'user' => $transformedUser
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request) {
@@ -72,6 +72,6 @@ class AuthController extends Controller
             $user->tokens()->delete();
         }
 
-        return $this->success('Logout successful');
+        return $this->success('Logout successful', 200);
     }
 }

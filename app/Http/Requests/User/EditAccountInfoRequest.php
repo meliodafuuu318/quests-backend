@@ -23,16 +23,16 @@ class EditAccountInfoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'sometimes|string|unique:users,username',
-            'firstName' => 'sometimes|string',
-            'lastName' => 'sometimes|string',
-            'birthdate' => 'sometimes|date',
-            'gender' => ['sometimes|', Rule::in(['M', 'F', 'Other', 'Prefer not to say'])],
-            'city' => 'sometimes|string',
-            'province' => 'sometimes|string',
-            'country' => 'sometimes|string',
-            'contactNumber' => 'sometimes|string|regex:/^09\d{9}$/',
-            'bio' => 'sometimes|string',
+            'username' => 'string|unique:users,username',
+            'firstName' => 'string',
+            'lastName' => 'string',
+            'birthdate' => 'date',
+            'gender' => [Rule::in(['M', 'F', 'Other', 'Prefer not to say'])],
+            'city' => 'string',
+            'province' => 'string',
+            'country' => 'string',
+            'contactNumber' => 'string|regex:/^09\d{9}$/',
+            'bio' => 'string',
         ];
     }
 }

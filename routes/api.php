@@ -24,4 +24,6 @@ Route::group([
     'middleware' => 'auth:sanctum'
 ], function ($route) {
     $route->get('/account-info', [UserController::class, 'getAccountInfo']);
+    $route->put('/account-info', [UserController::class, 'editAccountInfo']);
+    $route->get('/', [UserController::class, 'indexUsers']);
 });

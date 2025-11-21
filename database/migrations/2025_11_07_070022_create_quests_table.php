@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('quests', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->unsignedBigInteger('post_id');
+            $table->unsignedBigInteger('post_id')->nullable();
             $table->foreign('post_id')->references('id')->on('social_activities')->cascadeOnDelete();
             $table->unsignedBigInteger('creator_id');
             $table->foreign('creator_id')->references('id')->on('users')->cascadeOnDelete();

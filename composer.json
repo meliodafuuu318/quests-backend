@@ -13,7 +13,9 @@
         "climactic/laravel-credits": "^1.3",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
+        "laravel/scout": "^10.22",
         "laravel/tinker": "^2.10.1",
+        "meilisearch/meilisearch-php": "^1.16",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {

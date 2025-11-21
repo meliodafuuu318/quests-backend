@@ -97,23 +97,34 @@ class UserController extends Controller
     }
 
     public function searchUsers(Request $request) {
-        $query = User::query();
-
-        if ($request->filled('name')) {
-            $query->where('username', 'like', '%' . $request->name . '%')
-                ->orwhere('first_name', 'like', '%' . $request->name . '%')
-                ->orwhere('last_name', 'like', '%' . $request->name . '%');
+        if (!$request->filled('name')) {
+            return $this->success('Users fetched successfully', [], 200);
         }
-        $filteredUsers = $query->get();
-        $transformedUsers = $filteredUsers->map(function ($user) {
+
+        $keyword = $request->name;
+
+        $meiliResults = User::search($keyword)->get();
+
+        $soundexResults = User::whereRaw("SOUNDEX(username) = SOUNDEX(?)", [$keyword])
+            ->orWhereRaw("SOUNDEX(first_name) = SOUNDEX(?)", [$keyword])
+            ->orWhereRaw("SOUNDEX(last_name) = SOUNDEX(?)", [$keyword])
+            ->get();
+
+
+        $combined = $meiliResults
+            ->merge($soundexResults)
+            ->unique('id')
+            ->values();
+
+        $users = $combined->map(function ($user) {
             return [
-                'username' => $user->username,
+                'username'  => $user->username,
                 'firstName' => $user->first_name,
-                'lastName' => $user->last_name
+                'lastName'  => $user->last_name,
             ];
         });
 
-        return $this->success('Users fetched successfully', $transformedUsers, 200);
+        return $this->success('Users fetched successfully', $users, 200);
     }
 
     public function showUser(Request $request) {
@@ -130,11 +141,34 @@ class UserController extends Controller
         //
     }
 
-    public function sendFriendRequest() {
-        //
+    public function sendFriendRequest(Request $request) {
+        $user = User::find(auth()->user()->id);
+
+        if (!$user) {
+            return $this->error('User not found', 404);
+        }
+
+        if ($request->has('username')) {
+            $friend = User::where('username', $request->username)->first();
+
+            if (!$friend) {
+                return $this->error('User not found', 404);
+            }
+
+            $friendRequest = Friend::create([
+                'user_id' => $user->id,
+                'friend_id' => $friend->id,
+            ]);
+
+            return $this->success('Friend request sent', $friendRequest, 200);
+        }
     }
 
     public function acceptFriendRequest() {
+        //
+    }
+
+    public function indexFriendRequests() {
         //
     }
 }

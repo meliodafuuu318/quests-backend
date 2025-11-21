@@ -17,11 +17,12 @@ use App\Models\{
 use Climactic\Credits\Traits\HasCredits;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, hasCredits, hasApiTokens, hasRoles;
+    use HasFactory, Notifiable, hasCredits, hasApiTokens, hasRoles, Searchable;
 
     /**
      * The attributes that are mass assignable.

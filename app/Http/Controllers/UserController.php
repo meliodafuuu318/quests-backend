@@ -185,11 +185,96 @@ class UserController extends Controller
         }
     }
 
-    public function acceptFriendRequest() {
-        //
+    public function acceptFriendRequest(Request $request) {
+        $user = User::find(auth()->user()->id);
+
+        $friendIds = Friend::where('friend_id', $user->id)
+            ->where('status', 'pending_request')
+            ->pluck('user_id');
+        
+        // $friendUsernames = [];
+        // $friendUsernames = collect($friendUsernames);
+
+        // foreach ($friendIds as $id) {
+        //     $friend = User::where('id', $id)->first();
+
+        //     $friendUsernames->append($friend->username);
+        // }
+
+        $friendUsernames = User::whereIn('id', function ($query) use ($user) {
+            $query->select('user_id')
+                ->from('friends')
+                ->where('friend_id', $user->id)
+                ->where('status', 'pending_request');
+        })->pluck('username');
+
+        $friendRequest = null;
+
+        foreach ($friendUsernames as $username) {
+            if ($username !== $request->username) {
+                continue;
+            } else {
+                $friend = User::where('username', $username)->first();
+                $friendRequest = Friend::where('user_id', $friend->id)->first();
+            }
+        }
+
+        if ($friendRequest === null) {
+            return $this->error('Friend request not found', 404);
+        } else {
+            $friendRequest->update(['status' => 'friend']);
+            return $this->success('Friend request accepted', 200);
+        }
     }
 
     public function indexFriendRequests() {
-        //
+        $user = User::find(auth()->user()->id);
+
+        $incomingRequests = Friend::where('friend_id', $user->id)
+            ->where('status', 'pending_request')
+            ->get();
+        $sentRequests = Friend::where('user_id', $user->id)
+            ->where('status', 'pending_request')
+            ->get();
+        
+        $allRequests = [
+            'incomingRequests' => $incomingRequests->map(function ($friendRequest) {
+                    return  [
+                        'sender' => $friendRequest->user->username,
+                        'sentOn' => $friendRequest->created_at,
+                    ];
+                }),
+            'sentRequests' => $sentRequests->map(function ($friendRequest) {
+                    return [
+                        'sentTo' => $friendRequest->friend->username,
+                        'sentOn' => $friendRequest->created_at,
+                    ];
+                }),
+        ];
+
+        return $this->success('Friend requests fetched successfully', $allRequests, 200);
+    }
+
+    public function indexFriends() {
+        $user = User::find(auth()->user()->id);
+
+        $friends = Friend::where('status', 'friend')
+            ->where('user_id', $user->id)
+            ->orWhere('friend_id', $user->id)
+            ->get();
+
+        $transformedFriends = $friends->map(function ($friend) use ($user) {
+            if ($user->id === $friend->user_id) {
+                $username = $friend->friend->username;
+            } elseif ($user->id === $friend->friend_id) {
+                $username = $friend->user->username;
+            }
+            return [
+                'username' => $username,
+                'friendsSince' => $friend->updated_at
+            ];
+        });
+
+        return $this->success('Friend list fetched successfully', $transformedFriends, 200);
     }
 }

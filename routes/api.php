@@ -29,3 +29,13 @@ Route::group([
     $route->get('/search', [UserController::class, 'searchUsers']);
     $route->get('/show', [UserController::class, 'showUser']);
 });
+
+Route::group([
+    'prefix' => 'user/friend',
+    'middleware' => 'auth:sanctum'
+], function ($route) {
+    $route->get('/requests', [UserController::class, 'indexFriendRequests']);
+    $route->get('/', [UserController::class, 'indexFriends']);
+    $route->put('/accept', [UserController::class, 'acceptFriendRequest']);
+    $route->post('/send', [UserController::class, 'sendFriendRequest']);
+});

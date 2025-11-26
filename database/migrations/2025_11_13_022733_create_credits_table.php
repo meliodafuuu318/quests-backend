@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -10,6 +11,7 @@ return new class extends Migration
     {
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->morphs('creditable');
             $table->decimal('amount', 10, 2);
             $table->decimal('running_balance', 10, 2);

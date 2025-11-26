@@ -176,6 +176,16 @@ class UserController extends Controller
                 return $this->error('User not found', 404);
             }
 
+            $requestExists = Friend::where('user_id', $friend->id)
+                ->orWhere('friend_id', $friend->id)
+                ->where('friend_id', $user->id)
+                ->orWhere('user_id', $friend->id)
+                ->first();
+
+            if ($requestExists) {
+                return $this->error('Friend request already exists', 400);
+            }
+
             $friendRequest = Friend::create([
                 'user_id' => $user->id,
                 'friend_id' => $friend->id,
@@ -192,15 +202,6 @@ class UserController extends Controller
             ->where('status', 'pending_request')
             ->pluck('user_id');
         
-        // $friendUsernames = [];
-        // $friendUsernames = collect($friendUsernames);
-
-        // foreach ($friendIds as $id) {
-        //     $friend = User::where('id', $id)->first();
-
-        //     $friendUsernames->append($friend->username);
-        // }
-
         $friendUsernames = User::whereIn('id', function ($query) use ($user) {
             $query->select('user_id')
                 ->from('friends')
@@ -215,7 +216,10 @@ class UserController extends Controller
                 continue;
             } else {
                 $friend = User::where('username', $username)->first();
-                $friendRequest = Friend::where('user_id', $friend->id)->first();
+                $friendRequest = Friend::where('user_id', $friend->id)
+                    ->where('friend_id', $user->id)
+                    ->where('status', 'pending_request')
+                    ->first();
             }
         }
 

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->enum('visibility', ['public', 'friends', 'private'])->default('public');
             $table->integer('reward_exp');
             $table->integer('reward_points');
-            $table->unsignedBigInteger('participant_count');
+            $table->unsignedBigInteger('participant_count')->default(1);
             $table->timestamps();
         });
     }

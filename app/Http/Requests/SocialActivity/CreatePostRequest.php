@@ -3,6 +3,7 @@
 namespace App\Http\Requests\SocialActivity;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreatePostRequest extends FormRequest
 {
@@ -22,7 +23,17 @@ class CreatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'type' => 'required', Rule::in(['post', 'comment', 'like']),
+            'title' => 'sometimes|string',
+            'content' => 'sometimes|string',
+            'visibility' => 'required', Rule::in(['public', 'friends', 'private']),
+            'rewardExp' => 'required|numeric|min:0',
+            'rewardPoints'=> 'required|numeric|min:0',
+            'tasks.*.title' => 'string',
+            'tasks.*.description' => 'string',
+            'tasks.*.rewardExp' => 'numeric|min:0',
+            'tasks.*.rewardPoints' => 'numeric|min:0',
+            'tasks.*.order' => 'numeric|min:1'
         ];
     }
 }

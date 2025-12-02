@@ -4,7 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AuthController,
-    UserController
+    UserController,
+    SocialActivityController
 };
 
 Route::get('/user', function (Request $request) {
@@ -38,4 +39,11 @@ Route::group([
     $route->get('/', [UserController::class, 'indexFriends']);
     $route->put('/accept', [UserController::class, 'acceptFriendRequest']);
     $route->post('/send', [UserController::class, 'sendFriendRequest']);
+});
+
+Route::group([
+    'prefix' => 'post',
+    'middleware' => 'auth:sanctum'
+], function ($route) {
+    $route->post('/create', [SocialActivityController::class, 'createPost']);
 });

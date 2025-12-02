@@ -20,7 +20,7 @@ class SocialActivityController extends Controller
         $user = User::find(auth()->user()->id);
 
         DB::beginTransaction();
-        
+
         try {
             if ($request->type === 'post') {
                 $post = SocialActivity::create([
@@ -34,11 +34,11 @@ class SocialActivityController extends Controller
                     'title' => $request->title,
                     'description' => $request->description,
                     'visibility' => $request->visibility,
-                    'reward_exp' => $request->reward_exp,
-                    'reward_points' => $request->reward_points,
+                    'reward_exp' => $request->rewardExp,
+                    'reward_points' => $request->rewardPoints,
                 ]);
 
-                foreach ($request->task as $task) {
+                foreach ($request->tasks as $task) {
                     QuestTask::create([
                         'quest_id' => $quest->id,
                         'title' => $task->title,
@@ -55,10 +55,13 @@ class SocialActivityController extends Controller
                     'tasks' => $quest->questTask
                 ];
 
+                DB::commit();
+
                 return $this->success('Post created successfully.', $data, 200);
             }
         } catch (\Exception $e) {
-            //
+            DB::rollback();
+            return $this->error('Post creation failed', 500);
         }
     }
 
@@ -71,7 +74,20 @@ class SocialActivityController extends Controller
     }
 
     public function createComment() {
-        //
+        $user = User::find(auth()->user()->id);
+
+        DB::beginTransaction();
+
+        try {
+            if ($request->type === 'comment') {
+                $comment = SocialActivity::create([
+                    'comment_target' => $request->commentTarget,
+                    'description' => $request->description
+                ]);
+            }
+        } catch (\Exception $e) {
+            //
+        }
     }
 
     public function updateComment() {

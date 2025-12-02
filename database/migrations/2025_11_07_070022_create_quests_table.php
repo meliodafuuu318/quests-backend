@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreign('post_id')->references('id')->on('social_activities')->cascadeOnDelete();
             $table->unsignedBigInteger('creator_id');
             $table->foreign('creator_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->string('title');
-            $table->string('description');
-            $table->enum('visibility', ['public', 'friends', 'private'])->default('public');
+            // $table->string('title');
+            // $table->string('description');
+            // $table->enum('visibility', ['public', 'friends', 'private'])->default('public');
             $table->integer('reward_exp');
             $table->integer('reward_points');
             $table->unsignedBigInteger('participant_count')->default(1);

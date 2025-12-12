@@ -26,14 +26,14 @@ class SocialActivityController extends Controller
                 $post = SocialActivity::create([
                     'user_id' => $user->id,
                     'type' => 'post',
+                    'title' => $request->title,
+                    'content' => $request->content,
+                    'visibility' => $request->visibility,
                 ]);
 
                 $quest = Quest::create([
                     'post_id' => $post->id,
                     'creator_id' => $user->id,
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'visibility' => $request->visibility,
                     'reward_exp' => $request->rewardExp,
                     'reward_points' => $request->rewardPoints,
                 ]);
@@ -82,7 +82,7 @@ class SocialActivityController extends Controller
             if ($request->type === 'comment') {
                 $comment = SocialActivity::create([
                     'comment_target' => $request->commentTarget,
-                    'description' => $request->description
+                    'content' => $request->content
                 ]);
             }
         } catch (\Exception $e) {

@@ -11,7 +11,8 @@ use App\Models\{
     QuestTask
 };
 use App\Requests\SocialActivity\{
-    CreatePostRequest
+    CreatePostRequest,
+    CreateCommentRequest
 };
 
 class SocialActivityController extends Controller
@@ -21,8 +22,8 @@ class SocialActivityController extends Controller
 
         DB::beginTransaction();
 
-        try {
-            if ($request->type === 'post') {
+        if ($request->type === 'post') {
+            try {
                 $post = SocialActivity::create([
                     'user_id' => $user->id,
                     'type' => 'post',
@@ -56,12 +57,11 @@ class SocialActivityController extends Controller
                 ];
 
                 DB::commit();
-
                 return $this->success('Post created successfully.', $data, 200);
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $this->error('Something went wrong', 500, $e);
             }
-        } catch (\Exception $e) {
-            DB::rollback();
-            return $this->error('Post creation failed', 500);
         }
     }
 
@@ -73,20 +73,33 @@ class SocialActivityController extends Controller
         //
     }
 
-    public function createComment() {
+    public function createComment(CreateCommentRequest $request) {
         $user = User::find(auth()->user()->id);
 
         DB::beginTransaction();
 
-        try {
-            if ($request->type === 'comment') {
-                $comment = SocialActivity::create([
-                    'comment_target' => $request->commentTarget,
-                    'content' => $request->content
-                ]);
+        if ($request->type === 'comment') {
+            try {
+                $post = SocialActivity::where('id', $request->commentTarget)
+                    ->where('type', 'post')
+                    ->get();
+
+                if (!$post) {
+                    return $this->error('Post not found', 404);
+                } else {
+                    $comment = SocialActivity::create([
+                        'user_id' => $user->id,
+                        'type' => 'comment',
+                        'comment_target' => $request->commentTarget,
+                        'content' => $request->content
+                    ]);
+                }
+                DB::commit();
+                return $this->success('Comment created successfully', $comment, 200);
+            } catch (\Exception $e) {
+                DB::rollback();
+                return $this->error('Something went wrong', 500, $e);
             }
-        } catch (\Exception $e) {
-            //
         }
     }
 
@@ -99,7 +112,25 @@ class SocialActivityController extends Controller
     }
 
     public function react() {
-        //
+        $user = User::find(auth()->user()->id);
+
+        if ($user) {
+            if ($request->type === 'like') {
+                $target = SocialActivity::whereIn('type', ['post', 'comment'])
+                    ->where('id', $request->likeTarget)
+                    ->get();
+
+                if (!$target) {
+                    return $this->error('Content not found', 404);
+                } else {
+                    $like = SocialActivity::create([
+                        'user_id' => $user->id,
+                        'type' => 'like',
+                        'like_target' => $request->likeTarget
+                    ]);
+                }
+            }
+        }
     }
 
     public function indexPosts() {

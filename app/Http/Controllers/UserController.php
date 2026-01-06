@@ -281,4 +281,23 @@ class UserController extends Controller
 
         return $this->success('Friend list fetched successfully', $transformedFriends, 200);
     }
+
+    public function blockUser(Request $request) {
+        if ($request->block === true) {
+            $user = User::find(auth()->user()->id);
+            $blockedUser = User::find($request->userId);
+
+            if (!$blockedUser) {
+                return $this->error('User not found', 404);
+            }
+
+            $block = Friend::create([
+                'user_id' => $user->id,
+                'friend_id' => $blockedUser->id,
+                'status' => 'blocked'
+            ]);
+
+            return $this->success('User has been blocked', 200);
+        }
+    }
 }

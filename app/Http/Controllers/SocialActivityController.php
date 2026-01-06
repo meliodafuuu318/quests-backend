@@ -12,7 +12,8 @@ use App\Models\{
 };
 use App\Requests\SocialActivity\{
     CreatePostRequest,
-    CreateCommentRequest
+    CreateCommentRequest,
+    UpdatePostRequest,
 };
 
 class SocialActivityController extends Controller

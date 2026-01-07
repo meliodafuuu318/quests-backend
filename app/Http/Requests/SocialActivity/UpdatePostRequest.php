@@ -3,6 +3,7 @@
 namespace App\Http\Requests\SocialActivity;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePostRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdatePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,9 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'visibility' => 'sometimes', Rule::in(['public', 'friends', 'private']),
+            'title' => 'sometimes',
+            'content' => 'sometimes'
         ];
     }
 }

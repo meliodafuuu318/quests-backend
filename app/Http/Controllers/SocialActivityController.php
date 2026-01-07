@@ -66,8 +66,21 @@ class SocialActivityController extends Controller
         }
     }
 
-    public function updatePost() {
-        //
+    public function updatePost(UpdatePostRequest $request) {
+        $user = User::find(auth()->user()->id);
+        $post = SocialActivity::find($request->postId);
+
+        if (!$post) {
+            return $this->error('Post not found', 404);
+        }
+
+        $post->update([
+            'visibility' => $request->visibility ?? $post->visibility,
+            'title' => $request->title ?? $post->title,
+            'content' => $request->content ?? $post->content,
+        ]);
+
+        return $this->success('Post updated successfully', $post, 200);
     }
 
     public function deletePost() {

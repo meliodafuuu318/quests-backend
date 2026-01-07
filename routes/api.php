@@ -39,6 +39,7 @@ Route::group([
     $route->get('/', [UserController::class, 'indexFriends']);
     $route->put('/accept', [UserController::class, 'acceptFriendRequest']);
     $route->post('/send', [UserController::class, 'sendFriendRequest']);
+    $route->post('/block', [UserController::class, 'blockUser']);
 });
 
 Route::group([

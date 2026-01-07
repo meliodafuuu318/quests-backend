@@ -64,7 +64,7 @@ class UserController extends Controller
         }
 
         $friendIds = Friend::where('user_id', $user->id)
-            ->where('status', 'friends')
+            ->where('status', 'friend')
             ->pluck('friend_id')
             ->merge(
                 Friend::where('friend_id', $user->id)->pluck('user_id')
@@ -319,12 +319,12 @@ class UserController extends Controller
 
         $transformedBlocked = $blocked->map(function ($block) use ($user) {
             return [
-                'username' => $block->friend_id->username,
-                'friendsSince' => $block->updated_at
+                'username' => $block->friend->username,
+                'blockedSince' => $block->updated_at
             ];
         });
 
-        return $this->success('Friend list fetched successfully', [$transformedFriends, $transformedBlocked], 200);
+        return $this->success('Friend list fetched successfully', ['friends' => $transformedFriends, 'blocked' => $transformedBlocked], 200);
     }
 
     public function blockUser(Request $request) {
@@ -334,6 +334,38 @@ class UserController extends Controller
 
             if (!$blockedUser) {
                 return $this->error('User not found', 404);
+            }
+
+            $friendExists = Friend::where('user_id', $user->id)
+                ->orWhere('friend_id', $user->id)
+                ->whereNot('status', 'blocked')
+                ->first();
+
+            $friendExists = Friend::where(function ($friend) use ($request, $user) {
+                    $friend->where('user_id', $user->id)
+                        ->where('friend_id', $request->userId);
+                })->orWhere(function ($friend) use ($request, $user) {
+                    $friend->where('friend_id', $user->id)
+                        ->where('user_id', $request->userId);
+                })->first();
+            
+            if ($friendExists) {
+                $friendExists->update([
+                    'status' => 'blocked'
+                ]);
+
+                return $this->success('User has been blocked', 200);
+            }
+
+            $blockExists = Friend::where('user_id', $friend->id)
+                ->orWhere('friend_id', $friend->id)
+                ->where('friend_id', $user->id)
+                ->orWhere('user_id', $friend->id)
+                ->where('status', 'blocked')
+                ->first();
+                
+            if ($blockExists) {
+                return $this->error('User already blocked', 400);
             }
 
             $block = Friend::create([

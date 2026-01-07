@@ -130,12 +130,13 @@ class UserController extends Controller
     }
 
     public function showUser(Request $request) {
-        $user = User::where('username', $request->username)->first();
+        $user = User::find(auth()->user()->id);
+        $targetUser = User::where('username', $request->username)->first();
 
-        $blockExists = Friend::where('user_id', $friend->id)
-            ->orWhere('friend_id', $friend->id)
+        $blockExists = Friend::where('user_id', $targetUser->id)
+            ->orWhere('friend_id', $targetUser->id)
             ->where('friend_id', $user->id)
-            ->orWhere('user_id', $friend->id)
+            ->orWhere('user_id', $targetUser->id)
             ->where('status', 'blocked')
             ->first();
             
@@ -351,6 +352,8 @@ class UserController extends Controller
             
             if ($friendExists) {
                 $friendExists->update([
+                    'user_id' => auth()->user()->id,
+                    'friend_id' => $blockedUser->id,
                     'status' => 'blocked'
                 ]);
 

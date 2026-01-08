@@ -14,6 +14,7 @@ use App\Requests\SocialActivity\{
     CreatePostRequest,
     CreateCommentRequest,
     UpdatePostRequest,
+    UpdateCommentRequest,
 };
 
 class SocialActivityController extends Controller
@@ -68,7 +69,10 @@ class SocialActivityController extends Controller
 
     public function updatePost(UpdatePostRequest $request) {
         $user = User::find(auth()->user()->id);
-        $post = SocialActivity::find($request->postId);
+        $post = SocialActivity::where('id', $request->postId)
+            ->where('user_id', $user->id)
+            ->where('type', 'post')
+            ->first();
 
         if (!$post) {
             return $this->error('Post not found', 404);
@@ -83,8 +87,16 @@ class SocialActivityController extends Controller
         return $this->success('Post updated successfully', $post, 200);
     }
 
-    public function deletePost() {
-        //
+    public function deletePost(Request $request) {
+        $user = User::find(auth()->user()->id);
+        $post = SocialActivity::where('id', $request->postId)
+            ->where('user_id', $user->id)
+            ->where('type', 'post')
+            ->first();
+
+        $post->delete();
+
+        return $this->success('Post deleted', 200);
     }
 
     public function createComment(CreateCommentRequest $request) {
@@ -117,12 +129,38 @@ class SocialActivityController extends Controller
         }
     }
 
-    public function updateComment() {
-        //
+    public function updateComment(UpdateCommentRequest $request) {
+        $user = User::find(auth()->user()->id);
+        $comment = SocialActivity::where('id', $request->commentId)
+            ->where('user_id', $user->id)
+            ->where('type', 'comment')
+            ->first();
+
+        if (!$post) {
+            return $this->error('Comment not found', 404);
+        }
+
+        $comment->update([
+            'content' => $request->content
+        ]);
+
+        return $this->success('Comment updated', $comment, 200);
     }
 
-    public function deleteComment() {
-        //
+    public function deleteComment(Request $request) {
+        $user = User::find(auth()->user()->id);
+        $comment = SocialActivity::where('id', $request->commentId)
+            ->where('user_id', $user->id)
+            ->where('type', 'comment')
+            ->first();
+
+        if (!$post) {
+            return $this->error('Comment not found', 404);
+        }
+
+        $comment->delete();
+
+        return $this->success('Comment deleted', 200);
     }
 
     public function react() {

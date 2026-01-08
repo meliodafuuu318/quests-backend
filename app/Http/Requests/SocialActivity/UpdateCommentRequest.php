@@ -3,10 +3,8 @@
 namespace App\Http\Requests\SocialActivity;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Models\SocialActivity;
 
-class CreateCommentRequest extends FormRequest
+class UpdateCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +22,7 @@ class CreateCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'commentTarget' => 'required', Rule::in(SocialActivity::where('type', 'post')->pluck('id')),
-            'content' => 'required|string'
+            'content' => 'required'
         ];
     }
 }

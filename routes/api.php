@@ -29,6 +29,7 @@ Route::group([
     $route->get('/', [UserController::class, 'indexUsers']);
     $route->get('/search', [UserController::class, 'searchUsers']);
     $route->get('/show', [UserController::class, 'showUser']);
+    $route->get('/posts', [UserController::class, 'indexUserPosts']);
 });
 
 Route::group([
@@ -46,5 +47,6 @@ Route::group([
     'prefix' => 'post',
     'middleware' => 'auth:sanctum'
 ], function ($route) {
+    $route->get('/', [SocialActivityController::class, 'indexPosts']);
     $route->post('/create', [SocialActivityController::class, 'createPost']);
 });

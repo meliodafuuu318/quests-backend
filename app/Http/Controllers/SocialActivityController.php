@@ -8,7 +8,8 @@ use App\Models\{
     SocialActivity,
     User,
     Quest,
-    QuestTask
+    QuestTask,
+    Friend
 };
 use App\Requests\SocialActivity\{
     CreatePostRequest,
@@ -246,7 +247,7 @@ class SocialActivityController extends Controller
                         )
                         *
                         CASE
-                            WHEN friends.id IS NOT NULL THEN 1.4
+                            WHEN MAX(friends.id) IS NOT NULL THEN 1.4
                             ELSE 1.0
                         END
                         *

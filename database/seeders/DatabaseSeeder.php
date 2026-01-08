@@ -8,7 +8,8 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\{
     RoleSeeder,
     UserSeeder,
-    SocialActivitySeeder
+    SocialActivitySeeder,
+    FriendSeeder
 };
 
 class DatabaseSeeder extends Seeder
@@ -30,7 +31,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             UserSeeder::class,
-            SocialActivitySeeder::class
+            SocialActivitySeeder::class,
+            FriendSeeder::class
         ]);
     }
 }

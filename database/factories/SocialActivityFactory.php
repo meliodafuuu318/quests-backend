@@ -23,7 +23,7 @@ class SocialActivityFactory extends Factory
             'user_id' => $userId,
             'type' => 'post',
             'visibility' => fake()->randomElement(['public', 'friends']),
-            'title' => 'This is a sample post by' . $user->username
+            'title' => 'This is a sample post by ' . $user->username
         ];
     }
 }

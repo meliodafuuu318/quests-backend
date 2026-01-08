@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\User\{
@@ -53,46 +53,46 @@ class UserController extends Controller
         $this->blockUser = $blockUser;
     }
     public function getAccountInfo() {
-        $this->getAccountInfo->execute();
+        return $this->getAccountInfo->execute();
     }
 
     public function editAccountInfo(EditAccountInfoRequest $request) {
-        $this->editAccountInfo->execute();
+        return $this->editAccountInfo->execute($request);
     }
 
     public function indexUsers() {
-        $this->indexUsers->execute();
+        return $this->indexUsers->execute();
     }
 
     public function searchUsers(Request $request) {
-        $this->searchUsers->execute();
+        return $this->searchUsers->execute($request);
     }
 
     public function showUser(Request $request) {
-        $this->showUser->execute();
+        return $this->showUser->execute($request);
     }
 
     public function indexUserPosts(Request $request) {
-        $this->indexUserPosts->execute();
+        return $this->indexUserPosts->execute($request);
     }
 
     public function sendFriendRequest(Request $request) {
-        $this->sendFriendRequest->execute();
+        return $this->sendFriendRequest->execute($request);
     }
 
     public function acceptFriendRequest(Request $request) {
-        $this->acceptFriendRequest->execute();
+        return $this->acceptFriendRequest->execute($request);
     }
 
     public function indexFriendRequests() {
-        $this->indexFriendRequests->execute();
+        return $this->indexFriendRequests->execute($request);
     }
 
-    public function indexFriends() {
-        $this->indexFriends->execute();
+    public function indexFriends(Request $request) {
+        return $this->indexFriends->execute($request);
     }
 
     public function blockUser(Request $request) {
-        $this->blockUser->execute();
+        return $this->blockUser->execute($request);
     }
 }

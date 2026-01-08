@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Traits\{
+use App\{
     ResponseAPI,
 };
 

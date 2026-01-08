@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Controllers\Controller;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\SocialActivity\{
@@ -47,34 +47,34 @@ class SocialActivityController extends Controller
         $this->react = $react;
     }
     public function createPost(CreatePostRequest $request) {
-        $this->createPost->execute();
+        return $this->createPost->execute($request);
     }
 
     public function updatePost(UpdatePostRequest $request) {
-        $this->updatePost->execute();
+        return $this->updatePost->execute($request);
     }
 
     public function deletePost(Request $request) {
-        $this->deletePost->execute();
+        return $this->deletePost->execute($request);
     }
 
     public function createComment(CreateCommentRequest $request) {
-        $this->createComment->execute();
+        return $this->createComment->execute($request);
     }
 
     public function updateComment(UpdateCommentRequest $request) {
-        $this->updateComment->execute();
+        return $this->updateComment->execute($request);
     }
 
     public function deleteComment(Request $request) {
-        $this->deleteComment->execute();
+        return $this->deleteComment->execute($request);
     }
 
     public function react(Request $request) {
-        $this->react->execute();
+        return $this->react->execute($request);
     }
 
     public function indexPosts(Request $request) {
-        $this->indexPosts->execute();
+        return $this->indexPosts->execute($request);
     }
 }

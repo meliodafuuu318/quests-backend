@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\ResponseAPI;
+use Illuminate\Routing\Controller as BaseController;
 
-abstract class Controller
+class Controller extends BaseController
 {
-    use ResponseAPI;
+    //
 }

@@ -7,9 +7,12 @@ use App\Models\{
     User,
     Quest
 };
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SocialActivity extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'id',
         'user_id',

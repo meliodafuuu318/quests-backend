@@ -115,6 +115,7 @@ class SocialActivityController extends Controller
                 } else {
                     $comment = SocialActivity::create([
                         'user_id' => $user->id,
+                        'visibility' => 'public',
                         'type' => 'comment',
                         'comment_target' => $request->commentTarget,
                         'content' => $request->content
@@ -177,6 +178,7 @@ class SocialActivityController extends Controller
                 } else {
                     $like = SocialActivity::create([
                         'user_id' => $user->id,
+                        'visibility' => 'public',
                         'type' => 'like',
                         'like_target' => $request->likeTarget
                     ]);

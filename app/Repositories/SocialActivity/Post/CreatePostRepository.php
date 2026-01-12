@@ -39,11 +39,11 @@ class CreatePostRepository extends BaseRepository
                 foreach ($request->tasks as $task) {
                     QuestTask::create([
                         'quest_id' => $quest->id,
-                        'title' => $task->title,
-                        'description' => $task->description,
-                        'reward_exp' => $task->rewardExp,
-                        'reward_points' => $task->rewardPoints,
-                        'order' => $task->order
+                        'title' => $task['title'],
+                        'description' => $task['description'],
+                        'reward_exp' => $task['rewardExp'],
+                        'reward_points' => $task['rewardPoints'],
+                        'order' => $task['order']
                     ]);
                 }
 
@@ -58,6 +58,7 @@ class CreatePostRepository extends BaseRepository
             } catch (\Exception $e) {
                 DB::rollback();
                 return $this->error('Something went wrong', 500, $e);
+                // return $e;
             }
         }
     }

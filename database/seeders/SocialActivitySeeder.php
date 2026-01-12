@@ -6,7 +6,10 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\{
     SocialActivity,
-    User
+    User,
+    Quest,
+    QuestTask,
+    QuestParticipant
 };
 use Faker\Factory as Faker;
 
@@ -39,6 +42,7 @@ class SocialActivitySeeder extends Seeder
                 ]);
                 $i+=1;
             }
+
         }
 
         $posts = collect($posts);

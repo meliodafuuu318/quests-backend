@@ -48,5 +48,5 @@ Route::group([
     'middleware' => 'auth:sanctum'
 ], function ($route) {
     $route->get('/', [SocialActivityController::class, 'indexPosts']);
-    $route->post('/create', [SocialActivityController::class, 'createPost']);
+    $route->post('/', [SocialActivityController::class, 'createPost']);
 });

@@ -45,7 +45,8 @@ class IndexUserPostsRepository extends BaseRepository
             return [
                 'username' => $post->user->username,
                 'id' => $post->id,
-                // 'title' => $post->quest->title,
+                'title' => $post->title,
+                'content' => $post->content,
                 'datetime' => $post->created_at,
             ];
         });

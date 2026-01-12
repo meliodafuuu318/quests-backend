@@ -29,6 +29,7 @@ class CreatePostRepository extends BaseRepository
                 ]);
 
                 $quest = Quest::create([
+                    'code' => $this->questCode(),
                     'post_id' => $post->id,
                     'creator_id' => $user->id,
                     'reward_exp' => $request->rewardExp,

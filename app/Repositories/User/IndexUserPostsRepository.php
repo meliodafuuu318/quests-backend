@@ -27,7 +27,11 @@ class IndexUserPostsRepository extends BaseRepository
                 $target->where('user_id', $targetUser->id)
                     ->orWhere('friend_id', $targetUser->id);
             })->first();
-            
+        
+        if ($user->id === $targetUser->id) {
+            $blockExists = null;    
+        }
+
         if ($blockExists) {
             return $this->error('Blocked user', 400);
         }

@@ -58,7 +58,6 @@ class CreatePostRepository extends BaseRepository
             } catch (\Exception $e) {
                 DB::rollback();
                 return $this->error('Something went wrong', 500, $e);
-                // return $e;
             }
         }
     }

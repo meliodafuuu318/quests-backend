@@ -49,4 +49,5 @@ Route::group([
 ], function ($route) {
     $route->get('/', [SocialActivityController::class, 'indexPosts']);
     $route->post('/', [SocialActivityController::class, 'createPost']);
+    $route->get('/show', [SocialActivityController::class, 'showPost']);
 });

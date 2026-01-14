@@ -12,21 +12,44 @@ use App\Models\{
     QuestParticipant
 };
 use Faker\Factory as Faker;
+use App\Generator;
 
 class SocialActivitySeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
+    use Generator;
+
     public function run(): void
     {
         $faker = Faker::create();
         $userCount = User::count();
-        $posts = SocialActivity::factory()->count($userCount*5)->create();
+        $posts = SocialActivity::factory()->count($userCount*2)->create();
         $comments = [];
 
         $users = User::all();
         foreach($posts as $post) {
+            $quest = Quest::create([
+                'code' => $this->questCode(),
+                'post_id' => $post->id,
+                'creator_id' => $post->user_id,
+                'reward_exp' => $faker->numberBetween(100, 1000),
+                'reward_points' => $faker->numberBetween(10, 100),
+            ]);
+            $questTasks = [];
+            for($i=1; $i<4; $i++) {
+                $order = $i;
+                $questTasks[] = QuestTask::create([
+                    'quest_id' => $quest->id,
+                    'title' => 'Task' . $order . ' of Quest#' . $quest->id,
+                    'description' => 'lorem ipsum',
+                    'reward_exp' => $faker->numberBetween(10, 100),
+                    'reward_points' => $faker->numberBetween(1, 10),
+                    'order' => $order
+                ]);
+            }
+
             $userIds = $users->pluck('id');
             $i = 0;
             $j = $faker->numberBetween(1, 5);

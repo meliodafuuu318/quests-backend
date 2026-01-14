@@ -21,7 +21,7 @@ class ShowPostRepository extends BaseRepository
             return $this->error('Post not found', 404);
         }
 
-        $questTasks = QuestTask::where('quest_id', $post->quest->id)
+        $questTasks = QuestTask::where('quest_id', $post->quest->id )
             ->orderBy('order', 'asc')
             ->get();
         $questTaskData = [];
@@ -48,7 +48,7 @@ class ShowPostRepository extends BaseRepository
             'questCode' => $post->quest->code,
             'questTasks' => $questTaskData,
             'commentCount' => $commentCount,
-            'reactCount' => $reactCount
+            'reactCount' => $reactCount 
         ];
 
         return $this->success('Post fetched successfully', $postData, 200);

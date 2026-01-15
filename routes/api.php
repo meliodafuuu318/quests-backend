@@ -65,4 +65,4 @@ Route::group([
     $route->delete('/delete', [SocialActivityController::class, 'deleteComment']);
 });
 
-Route::post('/react', [SocialActivityController::class, 'react']);
+Route::post('/react', [SocialActivityController::class, 'react'])->middleware('auth:sanctum');

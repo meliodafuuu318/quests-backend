@@ -18,6 +18,16 @@ class ReactRepository extends BaseRepository
                 $target = SocialActivity::whereIn('type', ['post', 'comment'])
                     ->where('id', $request->likeTarget)
                     ->first();
+                
+                $likeExists = SocialActivity::where('like_target', $target->id)
+                    ->where('user_id', $user->id)
+                    ->where('type', 'like')
+                    ->first();
+
+                if ($likeExists) {
+                    $likeExists->delete();
+                    return $this->success('Like removed', 200);
+                }
 
                 if (!$target) {
                     return $this->error('Content not found', 404);
@@ -26,7 +36,7 @@ class ReactRepository extends BaseRepository
                         'user_id' => $user->id,
                         'visibility' => 'public',
                         'type' => 'like',
-                        'like_target' => $request->likeTarget
+                        'like_target' => $target->id
                     ]);
                 }
             }

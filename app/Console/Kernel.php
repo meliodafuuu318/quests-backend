@@ -10,7 +10,6 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         MakeModule::class,
-        StorageFolderAccess::class,
     ];
 
     /**

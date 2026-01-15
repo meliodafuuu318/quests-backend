@@ -21,5 +21,30 @@ class UpdateQuestRepository extends BaseRepository
         if (!$quest) {
             return $this->error('Quest not found', 404);
         }
+
+        $quest->update([
+            'reward_exp' => $request->rewardExp ?? $quest->reward_exp,
+            'reward_points' => $request->rewardPoints ?? $quest->reward_points
+        ]);
+
+        if ($request->filled('questTasks')) {
+            $taskData = $request->questTasks;
+
+            $lastOrder = QuestTask::where('quest_id', $quest->id)
+                ->max('order');
+
+            $newTasks = [];
+
+            foreach ($taskData as $task) {
+                $newTasks[] = QuestTask::create([
+                    'quest_id' => $quest->id,
+                    'title' => $task['title'],
+                    'description' => $task['title'],
+                    'reward_exp' => $task['rewardExp'],
+                    'reward_points' => $task['rewardPoints'],
+                    'order' => $lastOrder + 1
+                ]);
+            }
+        }
     }
 }

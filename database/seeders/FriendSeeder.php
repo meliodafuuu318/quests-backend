@@ -18,7 +18,7 @@ class FriendSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
-        $users = User::all();
+        $users = User::role('USER')->get();
         $userIds = $users->pluck('id');
 
         foreach ($users as $user) {

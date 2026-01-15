@@ -17,7 +17,8 @@ class SocialActivityFactory extends Factory
      */
     public function definition(): array
     {
-        $userId = fake()->randomElement(User::pluck('id'));
+        $users = User::role('USER');
+        $userId = fake()->randomElement($users->pluck('id'));
         $user = User::find($userId);
         return [
             'user_id' => $userId,

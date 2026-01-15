@@ -28,7 +28,8 @@ class SocialActivitySeeder extends Seeder
         $posts = SocialActivity::factory()->count($userCount*2)->create();
         $comments = [];
 
-        $users = User::all();
+        $users = User::role('USER')->get();
+
         foreach($posts as $post) {
             $quest = Quest::create([
                 'code' => $this->questCode(),

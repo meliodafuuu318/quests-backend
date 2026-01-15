@@ -14,8 +14,8 @@ class UpdateQuestRepository extends BaseRepository
 {
     public function execute($request){
         $user = User::where('username', auth()->id())->first();
-        $quest = Quest::where('id', $request->questId)
-            ->where('user_id', $user->id)
+        $quest = Quest::where('code', $request->questCode)
+            ->where('creator_id', $user->id)
             ->first();
 
         if (!$quest) {

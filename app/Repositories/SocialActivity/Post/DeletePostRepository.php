@@ -19,6 +19,6 @@ class DeletePostRepository extends BaseRepository
 
         $post->delete();
 
-        return $this->success('Post deleted', 200);
+        return $this->success('Post and quest deleted', 200);
     }
 }

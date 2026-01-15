@@ -20,6 +20,8 @@ use App\Repositories\SocialActivity\{
     Post\ShowPostRepository,
     Post\UpdatePostRepository,
     Post\DeletePostRepository,
+    Post\ShowPostCommentsRepository,
+    Post\ShowPostReactsRepository,
     IndexPostsRepository,
     ReactRepository,
 };
@@ -34,6 +36,8 @@ class SocialActivityController extends Controller
         DeleteCommentRepository $deleteComment,
         CreatePostRepository $createPost,
         ShowPostRepository $showPost,
+        ShowPostCommentsRepository $showPostComments,
+        ShowPostReactsRepository $showPostReacts,
         UpdatePostRepository $updatePost,
         DeletePostRepository $deletePost,
         IndexPostsRepository $indexPosts,
@@ -44,6 +48,8 @@ class SocialActivityController extends Controller
         $this->deleteComment = $deleteComment;
         $this->createPost = $createPost;
         $this->showPost = $showPost;
+        $this->showPostComments = $showPostComments;
+        $this->showPostReacts = $showPostReacts;
         $this->updatePost = $updatePost;
         $this->deletePost = $deletePost;
         $this->indexPosts = $indexPosts;
@@ -67,6 +73,14 @@ class SocialActivityController extends Controller
 
     public function showPost(Request $request) {
         return $this->showPost->execute($request);
+    }
+
+    public function showPostComments(Request $request) {
+        return $this->showPostComments->execute($request);
+    }
+
+    public function showPostReacts(Request $request) {
+        return $this->showPostReacts->execute($request);
     }
 
     public function updateComment(UpdateCommentRequest $request) {

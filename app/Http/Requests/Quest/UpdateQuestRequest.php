@@ -11,7 +11,7 @@ class UpdateQuestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateQuestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'questId' => 'required',
+            'rewardExp' => 'sometimes|numeric|min:1',
+            'rewardPoints' => 'sometimes|numeric|min:1'
         ];
     }
 }

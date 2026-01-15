@@ -50,4 +50,19 @@ Route::group([
     $route->get('/', [SocialActivityController::class, 'indexPosts']);
     $route->post('/', [SocialActivityController::class, 'createPost']);
     $route->get('/show', [SocialActivityController::class, 'showPost']);
+    $route->put('/update', [SocialActivityController::class, 'updatePost']);
+    $route->delete('/delete', [SocialActivityController::class, 'deletePost']);
+    $route->get('/comments', [SocialActivityController::class, 'showPostComments']);
+    $route->get('/reacts', [SocialActivityController::class, 'showPostReacts']);
 });
+
+Route::group([
+    'prefix' => 'comment',
+    'middleware' => 'auth:sanctum'
+], function ($route) {
+    $route->post('/create', [SocialActivityController::class, 'createComment']);
+    $route->put('/update', [SocialActivityController::class, 'updateComment']);
+    $route->delete('/delete', [SocialActivityController::class, 'deleteComment']);
+});
+
+Route::post('/react', [SocialActivityController::class, 'react']);

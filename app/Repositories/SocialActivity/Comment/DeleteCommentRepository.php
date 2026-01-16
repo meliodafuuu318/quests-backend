@@ -11,6 +11,10 @@ use App\Models\{
 class DeleteCommentRepository extends BaseRepository
 {
     public function execute($request){
+        $request->validate([
+            'commentId' => 'required'
+        ]);
+        
         $user = User::find(auth()->user()->id);
         $comment = SocialActivity::where('id', $request->commentId)
             ->where('user_id', $user->id)

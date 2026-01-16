@@ -8,6 +8,10 @@ use App\Models\SocialActivity;
 class ShowPostCommentsRepository extends BaseRepository
 {
     public function execute($request){
+        $request->validate([
+            'postId' => 'required'
+        ]);
+        
         $post = SocialActivity::where('type', 'post')
             ->where('id', $request->postId)
             ->first();

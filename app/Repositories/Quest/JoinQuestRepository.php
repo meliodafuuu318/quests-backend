@@ -12,6 +12,10 @@ use App\Models\{
 class JoinQuestRepository extends BaseRepository
 {
     public function execute($request){
+        $request->validate([
+            'questCode' => 'required'
+        ]);
+        
         $user = User::find(auth()->id());
         $quest = Quest::where('code', $request->questCode)
             ->first();

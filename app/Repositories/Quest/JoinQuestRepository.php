@@ -6,7 +6,9 @@ use App\Repositories\BaseRepository;
 use App\Models\{
     User,
     Quest,
-    QuestParticipant
+    QuestParticipant,
+    QuestTask,
+    QuestTaskParticipant
 };
 
 class JoinQuestRepository extends BaseRepository
@@ -15,7 +17,7 @@ class JoinQuestRepository extends BaseRepository
         $request->validate([
             'questCode' => 'required'
         ]);
-        
+
         $user = User::find(auth()->id());
         $quest = Quest::where('code', $request->questCode)
             ->first();
@@ -30,10 +32,22 @@ class JoinQuestRepository extends BaseRepository
             'joined_at' => Carbon::now() 
         ]);
 
+        $questTaskModels = QuestTask::where('quest_id', $quest->id)
+            ->get();
+
+        $participantQuestTasks = [];
+
+        foreach ($questTaskModels as $task) {
+            $participantQuestTasks[] = QuestParticipantTask::create([
+                'quest_participant_id' => $questParticipant->id,
+                'quest_task_id' => $task->id,
+            ]);
+        } 
+
         $quest->update([
             'participant_count' => $quest->participant_count + 1
         ]);
 
-        return $this->success('Joined quest successfully', $questParticipant, 200);
+        return $this->success('Joined quest successfully', [$questParticipant, $participantQuestTasks], 200);
     }
 }

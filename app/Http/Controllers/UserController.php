@@ -9,13 +9,16 @@ use App\Http\Requests\User\{
     EditAccountInfoRequest
 };
 
-use App\Repositories\User\{
+use App\Repositories\User\User\{
     GetAccountInfoRepository,
     EditAccountInfoRepository,
     IndexUsersRepository,
     SearchUsersRepository,
     ShowUserRepository,
     IndexUserPostsRepository,
+};
+
+use App\Repositories\User\Friend\{
     SendFriendRequestRepository,
     AcceptFriendRequestRepository,
     IndexFriendRequestsRepository,

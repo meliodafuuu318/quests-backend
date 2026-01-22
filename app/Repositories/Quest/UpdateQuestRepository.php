@@ -39,10 +39,10 @@ class UpdateQuestRepository extends BaseRepository
                 $newTasks[] = QuestTask::create([
                     'quest_id' => $quest->id,
                     'title' => $task['title'],
-                    'description' => $task['title'],
+                    'description' => $task['description'],
                     'reward_exp' => $task['rewardExp'],
                     'reward_points' => $task['rewardPoints'],
-                    'order' => $lastOrder + 1
+                    'order' => $lastOrder + $task['order']
                 ]);
             }
         }

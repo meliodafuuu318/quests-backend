@@ -24,7 +24,13 @@ class UpdateQuestRequest extends FormRequest
         return [
             'questId' => 'required',
             'rewardExp' => 'sometimes|numeric|min:1',
-            'rewardPoints' => 'sometimes|numeric|min:1'
+            'rewardPoints' => 'sometimes|numeric|min:1',
+            'questTasks' => 'sometimes|array',
+            'questTasks.*.title' => 'required_with:questTasks',
+            'questTasks.*.description' => 'required_with:questTasks',
+            'questTasks.*.rewardExp' => 'required_with:questTasks',
+            'questTasks.*.rewardPoints' => 'required_with:questTasks',
+            'questTasks.*.order' => 'required_with:questTasks'
         ];
     }
 }

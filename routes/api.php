@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AuthController,
     UserController,
-    SocialActivityController
+    SocialActivityController,
+    QuestController,
 };
 
 Route::get('/user', function (Request $request) {
@@ -66,3 +67,12 @@ Route::group([
 });
 
 Route::post('/react', [SocialActivityController::class, 'react'])->middleware('auth:sanctum');
+
+Route::group([
+    'prefix' => 'quest',
+    'middleware' => 'auth:sanctum'
+], function ($route) {
+    $route->put('/update', [QuestController::class, 'updateQuest']);
+    $route->post('/join', [QuestController::class, 'joinQuest']);
+    $route->put('/task/update', [QuestController::class, 'updateQuestTask']);
+});

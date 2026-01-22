@@ -28,9 +28,9 @@ class UpdateQuestRequest extends FormRequest
             'questTasks' => 'sometimes|array',
             'questTasks.*.title' => 'required_with:questTasks',
             'questTasks.*.description' => 'required_with:questTasks',
-            'questTasks.*.rewardExp' => 'required_with:questTasks',
-            'questTasks.*.rewardPoints' => 'required_with:questTasks',
-            'questTasks.*.order' => 'required_with:questTasks'
+            'questTasks.*.rewardExp' => 'required_with:questTasks|numeric|min:1',
+            'questTasks.*.rewardPoints' => 'required_with:questTasks|numeric|min:1',
+            'questTasks.*.order' => 'required_with:questTasks|numeric|min:1'
         ];
     }
 }

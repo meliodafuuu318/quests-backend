@@ -22,7 +22,12 @@ class UpdateQuestTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'taskId' => 'required',
+            'title' => 'sometimes',
+            'description' => 'sometimes',
+            'rewardExp' => 'sometimes|numeric|min:1',
+            'rewardPoints' => 'sometimes|numeric|min:1',
+            'order' => 'sometimes|numeric|min:1',
         ];
     }
 }

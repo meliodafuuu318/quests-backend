@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "climactic/laravel-credits": "^1.3",
+        "dedoc/scramble": "^0.13.10",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.22",

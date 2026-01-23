@@ -17,13 +17,13 @@ Route::group([
     'prefix' => 'auth'
 ], function ($route) {
     $route->post('/register', [AuthController::class, 'register']);
-    $route->post('/login', [AuthController::class, 'login']);
-    $route->post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    $route->post('/login', [AuthController::class, 'login'])->middleware('verified');
+    $route->post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum', 'verified');
 });
 
 Route::group([
     'prefix' => 'user',
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum', 'verified'
 ], function ($route) {
     $route->get('/account-info', [UserController::class, 'getAccountInfo']);
     $route->put('/account-info', [UserController::class, 'editAccountInfo']);
@@ -35,7 +35,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'user/friend',
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum', 'verified'
 ], function ($route) {
     $route->get('/requests', [UserController::class, 'indexFriendRequests']);
     $route->get('/', [UserController::class, 'indexFriends']);
@@ -46,7 +46,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'post',
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum', 'verified'
 ], function ($route) {
     $route->get('/', [SocialActivityController::class, 'indexPosts']);
     $route->post('/', [SocialActivityController::class, 'createPost']);
@@ -59,18 +59,18 @@ Route::group([
 
 Route::group([
     'prefix' => 'comment',
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum', 'verified'
 ], function ($route) {
     $route->post('/create', [SocialActivityController::class, 'createComment']);
     $route->put('/update', [SocialActivityController::class, 'updateComment']);
     $route->delete('/delete', [SocialActivityController::class, 'deleteComment']);
 });
 
-Route::post('/react', [SocialActivityController::class, 'react'])->middleware('auth:sanctum');
+Route::post('/react', [SocialActivityController::class, 'react'])->middleware('auth:sanctum', 'verified');
 
 Route::group([
     'prefix' => 'quest',
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum', 'verified'
 ], function ($route) {
     $route->put('/update', [QuestController::class, 'updateQuest']);
     $route->post('/join', [QuestController::class, 'joinQuest']);

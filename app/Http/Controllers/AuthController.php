@@ -11,6 +11,7 @@ use App\Http\Requests\Auth\{
     LoginRequest
 };
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -30,6 +31,8 @@ class AuthController extends Controller
                 $newUser->assignRole($request->role);
 
                 DB::commit();
+
+                event(new Registered($newUser));
 
                 return $this->success('User created successfully', $newUser, 200);
 

@@ -6,27 +6,31 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\Quest\{
-    UpdateQuestRequest
+    UpdateQuestRequest,
+    UpdateQuestTaskRequest
 };
 
 use App\Repositories\Quest\{
     UpdateQuestRepository,
     JoinQuestRepository,
-    UpdateQuestTaskRepository
+    UpdateQuestTaskRepository,
+    CompleteTaskRepository
 };
 
 class QuestController extends Controller
 {
-    protected $updateQuest;
+    protected $updateQuest, $joinQuest, $updateQuestTask, $completeTask;
 
     public function __construct (
         UpdateQuestRepository $updateQuest,
         JoinQuestRepository $joinQuest,
-        UpdateQuestTaskRepository $updateQuestTask
+        UpdateQuestTaskRepository $updateQuestTask,
+        CompleteTaskRepository $completeTask
     ) {
         $this->updateQuest = $updateQuest;
         $this->joinQuest = $joinQuest;
         $this->updateQuestTask = $updateQuestTask;
+        $this->completeTask = $completeTask;
     }
 
     public function updateQuest(UpdateQuestRequest $request) {
@@ -37,7 +41,11 @@ class QuestController extends Controller
         return $this->joinQuest->execute($request);
     }
 
-    public function updateQuestTask(Request $request) {
+    public function updateQuestTask(UpdateQuestTaskRequest $request) {
         return $this->updateQuestTask->execute($request);
+    }
+
+    public function completeTask(Request $request) {
+        return $this->completeTask->execute($request);
     }
 }

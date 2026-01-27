@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\{
-    UserItem
+    UserItem,
+    Asset
 };
 
 class ShopItem extends Model
@@ -13,7 +14,7 @@ class ShopItem extends Model
         'name',
         'type',
         'price',
-        // 'asset_id'
+        'asset_id'
     ];
     
     protected $hidden = [

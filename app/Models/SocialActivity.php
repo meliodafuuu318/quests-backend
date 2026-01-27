@@ -20,11 +20,11 @@ class SocialActivity extends Model
         'visibility',
         'title',
         'content',
+        'media_id',
         'comment_target',
         'like_target',
         'created_at',
         'updated_at',
-        // 'asset_id'
     ];
 
     public function user() {

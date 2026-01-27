@@ -19,7 +19,6 @@ use Climactic\Credits\Traits\HasCredits;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Scout\Searchable;
-use Illuminate\Auth\Events\Registered;
 
 class User extends Authenticatable implements MustVerifyEmail
 {

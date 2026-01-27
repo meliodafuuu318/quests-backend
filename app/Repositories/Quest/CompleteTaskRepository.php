@@ -20,6 +20,12 @@ class CompleteTaskRepository extends BaseRepository
             return $this->error('Task not found', 404);
         }
 
-
+        $completionComment = SocialActivity::create([
+            'user_id' => auth()->id(),
+            'type' => 'comment',
+            'visibility' => 'public',
+            'content' => 'Task: ' . $task->questTask()->title . ' completed.',
+            'comment_target' => $task->questTask()->quest()->socialActivity()->id,
+        ]);
     }
 }

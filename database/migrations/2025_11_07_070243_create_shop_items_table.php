@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', ['avatar', 'avatar_border', 'emote'])->default('avatar');
             $table->unsignedBigInteger('price');
-            // $table->foreignIdFor(Asset::class);
+            $table->foreignIdFor(Asset::class)->constrained();
             $table->timestamps();
         });
     }

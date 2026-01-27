@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\{
-    UserAchievement
+    UserAchievement,
+    Asset
 };
 
 class Achievement extends Model
@@ -14,6 +15,7 @@ class Achievement extends Model
         'name',
         'description',
         'exp_reward',
+        'asset_id'
     ];
 
     protected $hidden = [

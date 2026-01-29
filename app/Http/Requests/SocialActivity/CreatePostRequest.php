@@ -33,7 +33,8 @@ class CreatePostRequest extends FormRequest
             'tasks.*.description' => 'string',
             'tasks.*.rewardExp' => 'numeric|min:0',
             'tasks.*.rewardPoints' => 'numeric|min:0',
-            'tasks.*.order' => 'numeric|min:1'
+            'tasks.*.order' => 'numeric|min:1',
+            'media' => 'sometimes|file|mimes:jpg,jpeg,png,webp,gif'
         ];
     }
 }

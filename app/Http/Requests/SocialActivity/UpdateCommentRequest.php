@@ -22,7 +22,8 @@ class UpdateCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required'
+            'content' => 'required',
+            'media' => 'sometimes|file|mimes:jpg,jpeg,png,webp,gif' 
         ];
     }
 }

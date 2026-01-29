@@ -25,7 +25,8 @@ class UpdatePostRequest extends FormRequest
         return [
             'visibility' => 'sometimes', Rule::in(['public', 'friends', 'private']),
             'title' => 'sometimes',
-            'content' => 'sometimes'
+            'content' => 'sometimes',
+            'media' => 'sometimes|file|mimes:jpg,jpeg,png,webp,gif'
         ];
     }
 }

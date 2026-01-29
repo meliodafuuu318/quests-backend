@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\{
     QuestParticipant,
-    QuestTask
+    QuestTask,
+    CompletionVerification
 };
 
 class QuestParticipantTask extends Model
@@ -13,7 +14,10 @@ class QuestParticipantTask extends Model
     protected $fillable = [
         'quest_participant_id',
         'quest_task_id',
-        'completed_at'
+        'completion_status',
+        'creator_approval',
+        'completed_at',
+        'approved_at'
     ];
 
     protected $hidden = [
@@ -27,5 +31,13 @@ class QuestParticipantTask extends Model
 
     public function questTask() {
         return $this->belongsTo(QuestTask::class, 'quest_task_id');
+    }
+
+    public function quest() {
+        return $this->belongsTo(Quest::class);
+    }
+
+    public function completionVerification() {
+        return $this->hasMany(CompletionVerification::class, 'quest_participant_task_id');
     }
 }

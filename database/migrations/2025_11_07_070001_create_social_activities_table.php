@@ -18,11 +18,11 @@ return new class extends Migration
         Schema::create('social_activities', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->enum('type', ['post', 'comment', 'like'])->default('post');
+            $table->enum('type', ['post', 'comment', 'like', 'completion'])->default('post');
             $table->enum('visibility', ['public', 'friends', 'private'])->default('public');
             $table->string('title')->nullable();
             $table->string('content')->nullable();
-            $table->foreignIdFor(Media::class)->constrained()->nullable();
+            // $table->foreignIdFor(Media::class)->constrained()->nullable();
             $table->integer('comment_target')->nullable();
             $table->integer('like_target')->nullable();
             $table->timestamps();

@@ -4,35 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\{
-    Quest,
     User,
     QuestParticipantTask
 };
 
-class QuestParticipant extends Model
+class CompletionVerification extends Model
 {
     protected $fillable = [
+        'quest_participant_task_id',
+        'type',
         'user_id',
-        'quest_id',
-        'joined_at',
-        'completed_at'
     ];
 
     protected $hidden = [
-        'id',
         'created_at',
         'updated_at'
     ];
 
-    public function quest() {
-        return $this->belongsTo(Quest::class, 'quest_id');
+    public function questParticipantTask() {
+        return $this->belongsTo(QuestParticipantTask::class, 'quest_participant_task_id');
     }
 
     public function user() {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function questParticipantTask() {
-        return $this->hasMany(QuestParticipantTask::class, 'quest_participant_id');
     }
 }

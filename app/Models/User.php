@@ -13,7 +13,8 @@ use App\Models\{
     Friend,
     QuestParticipant,
     ParticipantTask,
-    SocialActivity
+    SocialActivity,
+    CompletionVerification
 };
 use Climactic\Credits\Traits\HasCredits;
 use Laravel\Sanctum\HasApiTokens;
@@ -99,4 +100,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function friend() {
         return $this->hasMany(Friend::class);
     }
-}
+
+    public function completionVerification() {
+        return $this->hasMany(CompletionVerification::class, 'user_id');
+    }
+} 

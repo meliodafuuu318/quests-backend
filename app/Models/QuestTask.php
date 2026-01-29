@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\{
     Quest,
-    ParticipantTask
+    QuestParticipantTask
 };
 
 class QuestTask extends Model
@@ -29,7 +29,7 @@ class QuestTask extends Model
         return $this->belongsTo(Quest::class, 'quest_id');
     }
 
-    public function participantTask() {
-        return $this->hasMany(ParticipantTask::class);
+    public function questParticipantTask() {
+        return $this->hasMany(QuestParticipantTask::class);
     }
 }

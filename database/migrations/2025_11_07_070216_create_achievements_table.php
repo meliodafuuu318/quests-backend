@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->unsignedBigInteger('exp_reward');
-            $table->foreignIdFor(Asset::class)->constrained();
+            // $table->foreignIdFor(Asset::class)->constrained();
             $table->timestamps();
         });
     }

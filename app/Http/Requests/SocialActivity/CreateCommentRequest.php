@@ -25,7 +25,8 @@ class CreateCommentRequest extends FormRequest
     {
         return [
             'commentTarget' => 'required', Rule::in(SocialActivity::where('type', 'post')->pluck('id')),
-            'content' => 'required|string'
+            'content' => 'required|string',
+            'media' => 'sometimes|file|mimes:jpg,jpeg,png,webp,gif'
         ];
     }
 }

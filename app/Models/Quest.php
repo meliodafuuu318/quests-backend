@@ -7,9 +7,10 @@ use App\Models\{
     User,
     QuestTask,
     QuestParticipant,
-    ParticipantTask,
+    QuestParticipantTask,
     SocialActivity
 };
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Quest extends Model
 {
@@ -43,8 +44,8 @@ class Quest extends Model
         return $this->hasMany(QuestParticipant::class);
     }
 
-    public function participantTask() {
-        return $this->hasMany(ParticipantTask::class);
+    public function questParticipantTask(): HasManyThrough {
+        return $this->hasManyThrough(QuestParticipantTask::class, QuestParticipant::class);
     }
 
     public function socialActivity() {

@@ -77,3 +77,5 @@ Route::group([
     $route->put('/task/update', [QuestController::class, 'updateQuestTask']);
     $route->put('/task/complete', [QuestController::class, 'completeTask']);
 });
+
+Route::post('/upload-media', [SocialActivityController::class, 'uploadMedia'])->middleware('auth:sanctum');

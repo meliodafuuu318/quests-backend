@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('last_name');
             $table->decimal('exp', 12,2)->default(0);
             $table->unsignedSmallInteger('level')->default(1);
-            // $table->unsignedBigInteger('avatar_id')->nullable();
-            // $table->foreign('avatar_id')->references('id')->on('user_items')->cascadeOnDelete();
+            $table->unsignedBigInteger('avatar_id')->nullable();
+            $table->foreign('avatar_id')->references('id')->on('assets')->cascadeOnDelete();
             // $table->unsignedBigInteger('avatar_frame_id')->nullable();
             // $table->foreign('avatar_frame_id')->references('id')->on('user_items')->cascadeOnDelete();
             $table->string('email')->unique();

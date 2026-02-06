@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\{
     User,
-    Media
 };
 
 return new class extends Migration
@@ -22,7 +21,6 @@ return new class extends Migration
             $table->enum('visibility', ['public', 'friends', 'private'])->default('public');
             $table->string('title')->nullable();
             $table->string('content')->nullable();
-            // $table->foreignIdFor(Media::class)->constrained()->nullable();
             $table->integer('comment_target')->nullable();
             $table->integer('like_target')->nullable();
             $table->timestamps();

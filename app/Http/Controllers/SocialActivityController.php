@@ -22,13 +22,14 @@ use App\Repositories\SocialActivity\{
     Post\DeletePostRepository,
     Post\ShowPostCommentsRepository,
     Post\ShowPostReactsRepository,
+    Media\UploadMediaRepository,
     IndexPostsRepository,
     ReactRepository,
 };
 
 class SocialActivityController extends Controller
 {
-    protected $createPost, $showPost, $updatePost, $deletePost, $createComment, $updateComment, $deleteComment, $react, $indexPosts;
+    protected $createPost, $showPost, $updatePost, $deletePost, $createComment, $updateComment, $deleteComment, $react, $indexPosts, $uploadMedia;
 
     public function __construct(
         CreateCommentRepository $createComment,
@@ -41,7 +42,8 @@ class SocialActivityController extends Controller
         UpdatePostRepository $updatePost,
         DeletePostRepository $deletePost,
         IndexPostsRepository $indexPosts,
-        ReactRepository $react
+        ReactRepository $react,
+        UploadMediaRepository $uploadMedia,
     ) {
         $this->createComment = $createComment;
         $this->updateComment = $updateComment;
@@ -54,6 +56,7 @@ class SocialActivityController extends Controller
         $this->deletePost = $deletePost;
         $this->indexPosts = $indexPosts;
         $this->react = $react;
+        $this->uploadMedia = $uploadMedia;
     }
     public function createPost(CreatePostRequest $request) {
         return $this->createPost->execute($request);
@@ -97,5 +100,9 @@ class SocialActivityController extends Controller
 
     public function indexPosts(Request $request) {
         return $this->indexPosts->execute($request);
+    }
+
+    public function uploadMedia(Request $request) {
+        return $this->uploadMedia->execute($request);
     }
 }

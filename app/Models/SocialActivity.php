@@ -20,7 +20,6 @@ class SocialActivity extends Model
         'visibility',
         'title',
         'content',
-        'media_id',
         'comment_target',
         'like_target',
         'created_at',
@@ -33,5 +32,9 @@ class SocialActivity extends Model
 
     public function quest() {
         return $this->hasOne(Quest::class, 'post_id');
+    }
+
+    public function media() {
+        return $this->hasMany(Media::class, 'social_activity_id');
     }
 }

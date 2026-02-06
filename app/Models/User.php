@@ -14,7 +14,9 @@ use App\Models\{
     QuestParticipant,
     ParticipantTask,
     SocialActivity,
-    CompletionVerification
+    CompletionVerification,
+    Media,
+    Asset
 };
 use Climactic\Credits\Traits\HasCredits;
 use Laravel\Sanctum\HasApiTokens;
@@ -46,7 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'country',
         'contact_number',
         'bio',
-        // 'avatar_id',
+        'avatar_id',
         // 'avatar_frame_id'
     ];
 
@@ -103,5 +105,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function completionVerification() {
         return $this->hasMany(CompletionVerification::class, 'user_id');
+    }
+
+    public function media() {
+        return $this->hasMany(Media::class, 'user_id');
+    }
+
+    public function avatar() {
+        return $this->hasOne(Asset::class, 'avatar_id');
     }
 } 

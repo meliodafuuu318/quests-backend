@@ -59,6 +59,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('user'),
             ]);
             $user->assignRole('USER');
+            $user->creditAdd(100.00, 'Registered');
             $i+=1;
         }
     }

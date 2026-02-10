@@ -10,6 +10,7 @@ use App\Models\{
     User,
     SocialActivity
 };
+use Carbon\Carbon;
 
 class CompleteQuestRepository extends BaseRepository
 {
@@ -17,10 +18,10 @@ class CompleteQuestRepository extends BaseRepository
         $user = auth()->user();
         $quest = Quest::find($request->questId);
 
-        $questParticipants = QuestParticipant::where('quest_id', $quest->id)->pluck('id');
-        $userParticipant = QuestParticipant::where('user_id', $user->id)->get();
+        $questParticipants[] = QuestParticipant::where('quest_id', $quest->id)->value('id');
+        $userParticipant = QuestParticipant::where('user_id', $user->id)->first();
 
-        if ($userParticipant->id->in_array($questParticipants)) {
+        if (in_array(number_format($userParticipant->id), $questParticipants)) {
             $userTasks = QuestParticipantTask::where('quest_participant_id', $userParticipant->id)->get();
             
             foreach ($userTasks as $task) {
@@ -32,6 +33,10 @@ class CompleteQuestRepository extends BaseRepository
             $userParticipant->update([
                 'completed_at' => Carbon::now()
             ]);
+            $user->update([
+                'exp' => $user->exp + $quest->reward_exp
+            ]);
+            $user->creditAdd($quest->reward_points, 'Completed quest');
 
             return $this->success('Quest completed', [], 200);
         }

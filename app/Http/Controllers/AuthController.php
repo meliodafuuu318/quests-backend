@@ -29,6 +29,7 @@ class AuthController extends Controller
                 ]);
 
                 $newUser->assignRole($request->role);
+                $newUser->creditAdd(100.00, 'Registered');
 
                 DB::commit();
 

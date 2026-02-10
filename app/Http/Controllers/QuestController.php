@@ -27,7 +27,7 @@ class QuestController extends Controller
         JoinQuestRepository $joinQuest,
         UpdateQuestTaskRepository $updateQuestTask,
         CompleteTaskRepository $completeTask,
-        CompleteTaskRepository $completeQuest
+        CompleteQuestRepository $completeQuest
     ) {
         $this->updateQuest = $updateQuest;
         $this->joinQuest = $joinQuest;

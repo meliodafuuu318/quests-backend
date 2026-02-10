@@ -8,8 +8,9 @@ use App\Models\{
     Quest,
     QuestParticipant,
     QuestTask,
-    QuestTaskParticipant
+    QuestParticipantTask
 };
+use Carbon\Carbon;
 
 class JoinQuestRepository extends BaseRepository
 {
@@ -47,6 +48,8 @@ class JoinQuestRepository extends BaseRepository
         $quest->update([
             'participant_count' => $quest->participant_count + 1
         ]);
+
+        $user->creditDeduct(25.00, 'Joined quest');
 
         return $this->success('Joined quest successfully', [$questParticipant, $participantQuestTasks], 200);
     }

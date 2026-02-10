@@ -15,7 +15,6 @@ class QuestParticipantTask extends Model
         'quest_participant_id',
         'quest_task_id',
         'completion_status',
-        'creator_approval',
         'completed_at',
         'approved_at'
     ];

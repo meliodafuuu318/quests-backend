@@ -47,7 +47,8 @@ class CompleteTaskRepository extends BaseRepository
                 if ($request->approve) {
                     if ($task->completion_status === 'community_verified') {
                         $task->update([
-                            'completion_status' => 'completed'
+                            'completion_status' => 'completed',
+                            'approved_at' => Carbon::now()
                         ]);
 
                         return $this->success('Task completion approved', [], 200);

@@ -14,23 +14,26 @@ use App\Repositories\Quest\{
     UpdateQuestRepository,
     JoinQuestRepository,
     UpdateQuestTaskRepository,
-    CompleteTaskRepository
+    CompleteTaskRepository,
+    CompleteQuestRepository
 };
 
 class QuestController extends Controller
 {
-    protected $updateQuest, $joinQuest, $updateQuestTask, $completeTask;
+    protected $updateQuest, $joinQuest, $updateQuestTask, $completeTask, $completeQuest;
 
     public function __construct (
         UpdateQuestRepository $updateQuest,
         JoinQuestRepository $joinQuest,
         UpdateQuestTaskRepository $updateQuestTask,
-        CompleteTaskRepository $completeTask
+        CompleteTaskRepository $completeTask,
+        CompleteTaskRepository $completeQuest
     ) {
         $this->updateQuest = $updateQuest;
         $this->joinQuest = $joinQuest;
         $this->updateQuestTask = $updateQuestTask;
         $this->completeTask = $completeTask;
+        $this->completeQuest = $completeQuest;
     }
 
     public function updateQuest(UpdateQuestRequest $request) {
@@ -47,5 +50,9 @@ class QuestController extends Controller
 
     public function completeTask(Request $request) {
         return $this->completeTask->execute($request);
+    }
+
+    public function completeQuest(Request $request) {
+        return $this->completeQuest->execute($request);
     }
 }

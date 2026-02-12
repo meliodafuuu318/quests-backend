@@ -9,6 +9,7 @@ use App\Models\{
     QuestTask,
     QuestParticipant
 };
+use App\Http\Resources\PostResource;
 
 class ShowPostRepository extends BaseRepository
 {
@@ -21,36 +22,36 @@ class ShowPostRepository extends BaseRepository
             return $this->error('Post not found', 404);
         }
 
-        $questTasks = QuestTask::where('quest_id', $post->quest->id )
-            ->orderBy('order', 'asc')
-            ->get();
-        $questTaskData = [];
+        // $questTasks = QuestTask::where('quest_id', $post->quest->id )
+        //     ->orderBy('order', 'asc')
+        //     ->get();
+        // $questTaskData = [];
 
-        foreach ($questTasks as $task) {
-            $questTaskData[] = [
-                'order' => $task->order,
-                'title' => $task->title,
-                'description' => $task->description,
-            ];
-        }
+        // foreach ($questTasks as $task) {
+        //     $questTaskData[] = [
+        //         'order' => $task->order,
+        //         'title' => $task->title,
+        //         'description' => $task->description,
+        //     ];
+        // }
 
-        $commentCount = SocialActivity::where('type', 'comment')
-            ->where('comment_target', $post->id)
-            ->count();
-        $reactCount = SocialActivity::where('type', 'like')
-            ->where('like_target', $post->id)
-            ->count();
+        // $commentCount = SocialActivity::where('type', 'comment')
+        //     ->where('comment_target', $post->id)
+        //     ->count();
+        // $reactCount = SocialActivity::where('type', 'like')
+        //     ->where('like_target', $post->id)
+        //     ->count();
 
-        $postData = [
-            'postId' => $post->id,
-            'postTitle' => $post->title,
-            'postContent' => $post->content,
-            'questCode' => $post->quest->code,
-            'questTasks' => $questTaskData,
-            'commentCount' => $commentCount,
-            'reactCount' => $reactCount 
-        ];
+        // $postData = [
+        //     'postId' => $post->id,
+        //     'postTitle' => $post->title,
+        //     'postContent' => $post->content,
+        //     'questCode' => $post->quest->code,
+        //     'questTasks' => $questTaskData,
+        //     'commentCount' => $commentCount,
+        //     'reactCount' => $reactCount 
+        // ];
 
-        return $this->success('Post fetched successfully', $postData, 200);
+        return $this->success('Post fetched successfully', new PostResource($post), 200);
     }
 }

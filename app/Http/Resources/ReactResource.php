@@ -14,6 +14,9 @@ class ReactResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'target' => $this->like_target,
+            'username' => $this->user->username
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories\SocialActivity\Post;
 
 use App\Repositories\BaseRepository;
 use App\Models\SocialActivity;
+use App\Http\Resources\ReactResource;
 
 class ShowPostReactsRepository extends BaseRepository
 {
@@ -24,6 +25,6 @@ class ShowPostReactsRepository extends BaseRepository
             ->where('like_target', $post->id)
             ->get();
 
-        return $this->success('Post reacts fetched successfully', $postReacts, 200);
+        return $this->success('Post reacts fetched successfully', ReactResource::collection($postReacts), 200);
     }
 }

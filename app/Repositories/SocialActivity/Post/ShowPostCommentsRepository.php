@@ -4,6 +4,7 @@ namespace App\Repositories\SocialActivity\Post;
 
 use App\Repositories\BaseRepository;
 use App\Models\SocialActivity;
+use App\Http\Resources\CommentResource;
 
 class ShowPostCommentsRepository extends BaseRepository
 {
@@ -24,6 +25,6 @@ class ShowPostCommentsRepository extends BaseRepository
             ->where('comment_target', $post->id)
             ->paginate(10);
 
-        return $this->success('Post comments fetched successfully', $postComments, 200);
+        return $this->success('Post comments fetched successfully', CommentResource::collection($postComments), 200);
     }
 }

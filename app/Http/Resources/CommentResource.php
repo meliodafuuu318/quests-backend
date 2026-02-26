@@ -18,7 +18,7 @@ class CommentResource extends JsonResource
             'username' => $this->user->username,
             'postId' => $this->comment_target,
             'content' => $this->content,
-            'media' => $this->media->filepath,
+            // 'media' => $this->media->filepath,
             'createdAt' => $this->created_at->format('Y-m-d h:i')
         ];
     }

@@ -5,15 +5,17 @@ namespace App\Repositories\SocialActivity\Post;
 use App\Repositories\BaseRepository;
 use App\Models\{
     SocialActivity,
-    Quest,
     QuestTask,
-    QuestParticipant
+    Media
 };
 use App\Http\Resources\PostResource;
 
 class ShowPostRepository extends BaseRepository
 {
-    public function execute($request){
+    public function execute($request)
+    {
+        $userId = auth()->id();
+
         $post = SocialActivity::where('id', $request->postId)
             ->where('type', 'post')
             ->first();
@@ -22,36 +24,34 @@ class ShowPostRepository extends BaseRepository
             return $this->error('Post not found', 404);
         }
 
-        // $questTasks = QuestTask::where('quest_id', $post->quest->id )
-        //     ->orderBy('order', 'asc')
-        //     ->get();
-        // $questTaskData = [];
+        $liked = SocialActivity::where('type', 'like')
+            ->where('like_target', $post->id)
+            ->where('user_id', $userId)
+            ->exists();
 
-        // foreach ($questTasks as $task) {
-        //     $questTaskData[] = [
-        //         'order' => $task->order,
-        //         'title' => $task->title,
-        //         'description' => $task->description,
-        //     ];
-        // }
+        $likesCount = SocialActivity::where('type', 'like')
+            ->where('like_target', $post->id)
+            ->count();
 
-        // $commentCount = SocialActivity::where('type', 'comment')
-        //     ->where('comment_target', $post->id)
-        //     ->count();
-        // $reactCount = SocialActivity::where('type', 'like')
-        //     ->where('like_target', $post->id)
-        //     ->count();
+        $commentsCount = SocialActivity::where('type', 'comment')
+            ->where('comment_target', $post->id)
+            ->count();
 
-        // $postData = [
-        //     'postId' => $post->id,
-        //     'postTitle' => $post->title,
-        //     'postContent' => $post->content,
-        //     'questCode' => $post->quest->code,
-        //     'questTasks' => $questTaskData,
-        //     'commentCount' => $commentCount,
-        //     'reactCount' => $reactCount 
-        // ];
+        $media = Media::where('social_activity_id', $post->id)
+            ->get()
+            ->map(fn($m) => ['filepath' => $m->filepath, 'id' => $m->id])
+            ->values();
 
-        return $this->success('Post fetched successfully', new PostResource($post), 200);
+        $postData = new PostResource($post);
+        $result   = $postData->toArray($request);
+
+        // Inject extra fields the Flutter app needs
+        $result['id']             = $post->id;
+        $result['liked']          = $liked;
+        $result['likes_count']    = $likesCount;
+        $result['comments_count'] = $commentsCount;
+        $result['media']          = $media;
+
+        return $this->success('Post fetched successfully', $result, 200);
     }
 }

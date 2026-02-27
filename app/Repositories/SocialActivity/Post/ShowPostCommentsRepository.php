@@ -3,16 +3,14 @@
 namespace App\Repositories\SocialActivity\Post;
 
 use App\Repositories\BaseRepository;
-use App\Models\SocialActivity;
-use App\Http\Resources\CommentResource;
+use App\Models\{SocialActivity, Media};
 
 class ShowPostCommentsRepository extends BaseRepository
 {
-    public function execute($request){
-        $request->validate([
-            'postId' => 'required'
-        ]);
-        
+    public function execute($request)
+    {
+        $request->validate(['postId' => 'required']);
+
         $post = SocialActivity::where('type', 'post')
             ->where('id', $request->postId)
             ->first();
@@ -23,8 +21,27 @@ class ShowPostCommentsRepository extends BaseRepository
 
         $postComments = SocialActivity::where('type', 'comment')
             ->where('comment_target', $post->id)
-            ->paginate(10);
+            ->orderBy('created_at', 'asc')
+            ->paginate(20);
 
-        return $this->success('Post comments fetched successfully', CommentResource::collection($postComments), 200);
+        $transformed = $postComments->getCollection()->map(function ($comment) {
+            $media = Media::where('social_activity_id', $comment->id)
+                ->get()
+                ->map(fn($m) => ['filepath' => $m->filepath])
+                ->values();
+
+            return [
+                'id'        => $comment->id,
+                'username'  => $comment->user->username,
+                'postId'    => $comment->comment_target,
+                'content'   => $comment->content,
+                'media'     => $media,
+                'createdAt' => $comment->created_at->format('Y-m-d h:i'),
+            ];
+        });
+
+        $postComments->setCollection($transformed);
+
+        return $this->success('Post comments fetched successfully', $postComments, 200);
     }
 }

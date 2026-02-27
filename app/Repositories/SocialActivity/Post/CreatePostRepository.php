@@ -32,9 +32,17 @@ class CreatePostRepository extends BaseRepository
                     'visibility' => $request->visibility,
                 ]);
 
-                // ── Handle media uploads ──────────────────────────────────────
+                // ── Media uploads ─────────────────────────────────────────────
+                // file('media') returns an array when the field name is 'media[]'
+                // (Flutter's multipart), or a single UploadedFile when it's 'media'.
+                // We normalise to array so the foreach always works safely.
                 if ($request->hasFile('media')) {
-                    foreach ($request->file('media') as $file) {
+                    $files = $request->file('media');
+                    if (!is_array($files)) {
+                        $files = [$files];
+                    }
+
+                    foreach ($files as $file) {
                         $filePath = $file->storeAs(
                             'media/' . now()->format('Y/m/d'),
                             'upload-' . $user->username . '-' . uniqid() . '.' . $file->extension(),
@@ -69,7 +77,7 @@ class CreatePostRepository extends BaseRepository
 
                 DB::commit();
 
-                // ── Broadcast via Pusher ──────────────────────────────────────
+                // ── Broadcast ─────────────────────────────────────────────────
                 $friendIds = Friend::where(function ($q) use ($user) {
                         $q->where('user_id', $user->id)
                           ->orWhere('friend_id', $user->id);
@@ -85,11 +93,10 @@ class CreatePostRepository extends BaseRepository
                     'title'      => $post->title,
                     'username'   => $user->username,
                     'visibility' => $post->visibility,
-                    'is_friend'  => true,   // recipients are friends by definition
+                    'is_friend'  => true,
                     'created_at' => $post->created_at->toIso8601String(),
                 ];
 
-                // Only broadcast to friends' private channels when visibility allows
                 $notifyFriends = in_array($post->visibility, ['public', 'friends'])
                     ? $friendIds
                     : [];

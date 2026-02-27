@@ -4,29 +4,30 @@ namespace App\Http\Requests\SocialActivity;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\SocialActivity;
 
 class CreateCommentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'commentTarget' => 'required', Rule::in(SocialActivity::where('type', 'post')->pluck('id')),
-            'content' => 'required|string',
-            'media' => 'sometimes|file|mimes:jpg,jpeg,png,webp,gif'
+            // Original had:  'commentTarget' => 'required', Rule::in(...)
+            // The comma makes Rule::in() a SEPARATE top-level array entry with no key,
+            // which Laravel ignores — so commentTarget only got 'required', not the
+            // existence check. Fixed by using proper array syntax.
+            'commentTarget' => ['required', 'exists:social_activities,id'],
+
+            // Original was 'required|string' — blocked media-only comments.
+            // Changed to 'sometimes' so a comment with only attached media is valid.
+            'content' => 'sometimes|nullable|string',
+
+            // Same fix as CreatePostRequest: was single-file rule, now array.
+            'media'   => 'sometimes|array',
+            'media.*' => 'file|mimes:jpg,jpeg,png,webp,gif,mp4,mov,avi,webm|max:102400',
         ];
     }
 }

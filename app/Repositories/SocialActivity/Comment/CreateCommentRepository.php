@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class CreateCommentRepository extends BaseRepository
 {
-    public function execute($request)   // ← was missing $request in original!
+    public function execute($request)
     {
         $user = User::find(auth()->user()->id);
 
@@ -29,17 +29,25 @@ class CreateCommentRepository extends BaseRepository
                     return $this->error('Post not found', 404);
                 }
 
+                // content is nullable — a media-only comment is allowed.
                 $comment = SocialActivity::create([
                     'user_id'        => $user->id,
                     'visibility'     => 'public',
                     'type'           => 'comment',
                     'comment_target' => $request->commentTarget,
-                    'content'        => $request->content,
+                    'content'        => $request->content ?? null,
                 ]);
 
-                // ── Handle media uploads ──────────────────────────────────────
+                // ── Media uploads ─────────────────────────────────────────────
+                // Normalise to array so foreach works whether Flutter sent
+                // 'media[]' (array) or the field arrives as a single file.
                 if ($request->hasFile('media')) {
-                    foreach ($request->file('media') as $file) {
+                    $files = $request->file('media');
+                    if (!is_array($files)) {
+                        $files = [$files];
+                    }
+
+                    foreach ($files as $file) {
                         $filePath = $file->storeAs(
                             'media/' . now()->format('Y/m/d'),
                             'upload-' . $user->username . '-' . uniqid() . '.' . $file->extension(),
@@ -48,6 +56,8 @@ class CreateCommentRepository extends BaseRepository
                         Media::create([
                             'filepath'           => '/storage/' . $filePath,
                             'user_id'            => $user->id,
+                            // Link to THIS comment's social_activity id so
+                            // ShowPostCommentsRepository can fetch them back.
                             'social_activity_id' => $comment->id,
                         ]);
                     }
@@ -55,7 +65,7 @@ class CreateCommentRepository extends BaseRepository
 
                 DB::commit();
 
-                // ── Broadcast via Pusher ──────────────────────────────────────
+                // ── Broadcast ─────────────────────────────────────────────────
                 $commentCount = SocialActivity::where('type', 'comment')
                     ->where('comment_target', $post->id)
                     ->count();

@@ -23,7 +23,7 @@ class PostResource extends JsonResource
             ->orderBy('order', 'asc')
             ->get();
 
-        $media  = Media::where('social_activity_id', $post->id)->get()
+        $media = Media::where('social_activity_id', $this->id)->get()
             ->map(fn($m) => ['filepath' => $m->filepath])->values();
 
         return [

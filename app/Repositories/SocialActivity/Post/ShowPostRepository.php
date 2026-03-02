@@ -46,11 +46,11 @@ class ShowPostRepository extends BaseRepository
         $result   = $postData->toArray($request);
 
         // Inject extra fields the Flutter app needs
-        $result['id']             = $post->id;
-        $result['liked']          = $liked;
-        $result['likes_count']    = $likesCount;
+        $result['id']  = $post->id;
+        $result['liked'] = $liked;
+        $result['likes_count'] = $likesCount;
         $result['comments_count'] = $commentsCount;
-        $result['media']          = $media;
+        $result['media'] = $media;
 
         return $this->success('Post fetched successfully', $result, 200);
     }

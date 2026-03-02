@@ -31,11 +31,11 @@ class ShowPostCommentsRepository extends BaseRepository
                 ->values();
 
             return [
-                'id'        => $comment->id,
-                'username'  => $comment->user->username,
-                'postId'    => $comment->comment_target,
-                'content'   => $comment->content,
-                'media'     => $media,
+                'id' => $comment->id,
+                'username' => $comment->user->username,
+                'postId' => $comment->comment_target,
+                'content' => $comment->content,
+                'media' => $media,
                 'createdAt' => $comment->created_at->format('Y-m-d h:i'),
             ];
         });

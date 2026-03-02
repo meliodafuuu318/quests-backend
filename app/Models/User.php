@@ -114,4 +114,8 @@ class User extends Authenticatable implements MustVerifyEmail
     public function avatar() {
         return $this->hasOne(Asset::class, 'avatar_id');
     }
+
+    public function notification() {
+        return $this->hasMany(Notification::class, 'user_id');
+    }
 } 

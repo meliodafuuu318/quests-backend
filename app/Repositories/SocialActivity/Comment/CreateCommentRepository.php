@@ -31,11 +31,11 @@ class CreateCommentRepository extends BaseRepository
 
                 // content is nullable — a media-only comment is allowed.
                 $comment = SocialActivity::create([
-                    'user_id'        => $user->id,
-                    'visibility'     => 'public',
-                    'type'           => 'comment',
+                    'user_id' => $user->id,
+                    'visibility' => 'public',
+                    'type' => 'comment',
                     'comment_target' => $request->commentTarget,
-                    'content'        => $request->content ?? null,
+                    'content' => $request->content ?? null,
                 ]);
 
                 // ── Media uploads ─────────────────────────────────────────────
@@ -49,13 +49,13 @@ class CreateCommentRepository extends BaseRepository
 
                     foreach ($files as $file) {
                         $filePath = $file->storeAs(
-                            'media/' . now()->format('Y/m/d'),
+                            'media/' . now()->format('Y-m-d'),
                             'upload-' . $user->username . '-' . uniqid() . '.' . $file->extension(),
                             'public'
                         );
                         Media::create([
-                            'filepath'           => '/storage/' . $filePath,
-                            'user_id'            => $user->id,
+                            'filepath' => '/storage/' . $filePath,
+                            'user_id' => $user->id,
                             // Link to THIS comment's social_activity id so
                             // ShowPostCommentsRepository can fetch them back.
                             'social_activity_id' => $comment->id,
@@ -71,14 +71,14 @@ class CreateCommentRepository extends BaseRepository
                     ->count();
 
                 event(new CommentEvent([
-                    'post_id'       => $post->id,
+                    'post_id' => $post->id,
                     'post_owner_id' => $post->user_id,
-                    'commenter_id'  => $user->id,
-                    'username'      => $user->username,
-                    'content'       => $comment->content,
+                    'commenter_id' => $user->id,
+                    'username' => $user->username,
+                    'content' => $comment->content,
                     'comment_count' => $commentCount,
-                    'created_at'    => $comment->created_at->toIso8601String(),
-                    'has_media'     => $request->hasFile('media'),
+                    'created_at' => $comment->created_at->toIso8601String(),
+                    'has_media' => $request->hasFile('media'),
                 ]));
 
                 return $this->success('Comment created successfully', $comment, 200);

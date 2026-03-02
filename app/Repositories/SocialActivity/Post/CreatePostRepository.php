@@ -25,10 +25,10 @@ class CreatePostRepository extends BaseRepository
         if ($request->type === 'post') {
             try {
                 $post = SocialActivity::create([
-                    'user_id'    => $user->id,
-                    'type'       => 'post',
-                    'title'      => $request->title,
-                    'content'    => $request->content,
+                    'user_id' => $user->id,
+                    'type' => 'post',
+                    'title' => $request->title,
+                    'content' => $request->content,
                     'visibility' => $request->visibility,
                 ]);
 
@@ -44,34 +44,34 @@ class CreatePostRepository extends BaseRepository
 
                     foreach ($files as $file) {
                         $filePath = $file->storeAs(
-                            'media/' . now()->format('Y/m/d'),
+                            'media/' . now()->format('Y-m-d'),
                             'upload-' . $user->username . '-' . uniqid() . '.' . $file->extension(),
                             'public'
                         );
                         Media::create([
-                            'filepath'           => '/storage/' . $filePath,
-                            'user_id'            => $user->id,
+                            'filepath' => '/storage/' . $filePath,
+                            'user_id' => $user->id,
                             'social_activity_id' => $post->id,
                         ]);
                     }
                 }
 
                 $quest = Quest::create([
-                    'code'          => $this->questCode(),
-                    'post_id'       => $post->id,
-                    'creator_id'    => $user->id,
-                    'reward_exp'    => $request->rewardExp,
+                    'code' => $this->questCode(),
+                    'post_id' => $post->id,
+                    'creator_id' => $user->id,
+                    'reward_exp' => $request->rewardExp,
                     'reward_points' => $request->rewardPoints,
                 ]);
 
                 foreach ($request->tasks as $task) {
                     QuestTask::create([
-                        'quest_id'      => $quest->id,
-                        'title'         => $task['title'],
-                        'description'   => $task['description'],
-                        'reward_exp'    => $task['rewardExp'],
+                        'quest_id' => $quest->id,
+                        'title' => $task['title'],
+                        'description' => $task['description'],
+                        'reward_exp' => $task['rewardExp'],
                         'reward_points' => $task['rewardPoints'],
-                        'order'         => $task['order'],
+                        'order' => $task['order'],
                     ]);
                 }
 
@@ -89,11 +89,11 @@ class CreatePostRepository extends BaseRepository
                     ->toArray();
 
                 $broadcastData = [
-                    'id'         => $post->id,
-                    'title'      => $post->title,
-                    'username'   => $user->username,
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'username' => $user->username,
                     'visibility' => $post->visibility,
-                    'is_friend'  => true,
+                    'is_friend' => true,
                     'created_at' => $post->created_at->toIso8601String(),
                 ];
 
@@ -104,7 +104,7 @@ class CreatePostRepository extends BaseRepository
                 event(new PostEvent($broadcastData, $notifyFriends));
 
                 return $this->success('Post created successfully.', [
-                    'post'  => $post,
+                    'post' => $post,
                     'quest' => $quest,
                     'tasks' => $quest->questTask,
                 ], 200);

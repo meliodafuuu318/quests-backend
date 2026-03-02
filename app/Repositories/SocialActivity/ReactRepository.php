@@ -35,9 +35,9 @@ class ReactRepository extends BaseRepository
                 $action = 'removed';
             } else {
                 SocialActivity::create([
-                    'user_id'     => $user->id,
-                    'visibility'  => 'public',
-                    'type'        => 'like',
+                    'user_id' => $user->id,
+                    'visibility' => 'public',
+                    'type' => 'like',
                     'like_target' => $target->id,
                 ]);
                 $action = 'added';
@@ -54,10 +54,10 @@ class ReactRepository extends BaseRepository
                 : $target->comment_target;   // comment's parent post
 
             event(new ReactEvent([
-                'post_id'    => $postId,
-                'target_id'  => $target->id,
+                'post_id' => $postId,
+                'target_id' => $target->id,
                 'likes_count' => $likeCount,
-                'action'     => $action,
+                'action' => $action,
             ]));
 
             return $this->success(

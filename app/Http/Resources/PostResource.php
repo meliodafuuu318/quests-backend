@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\{
     QuestTask,
-    SocialActivity
+    SocialActivity,
+    Media
 };
 
 class PostResource extends JsonResource
@@ -22,13 +23,18 @@ class PostResource extends JsonResource
             ->orderBy('order', 'asc')
             ->get();
 
+        $media  = Media::where('social_activity_id', $post->id)->get()
+            ->map(fn($m) => ['filepath' => $m->filepath])->values();
+
         return [
             'creator_username' => $this->user->username,
             'creator_full_name' => $this->user->first_name . ' ' . $this->user->last_name,
             'post' => [
                 'id' => $this->id,
+                'visibility' => $this->visibility,
                 'title' => $this->title,
                 'content' => $this->content ?? null,
+                'media' => $media,
                 'created_at' => $this->created_at->format('Y-m-d h:i'),
                 'updated_at' => $this->updated_at->format('Y-m-d h:i')
             ],

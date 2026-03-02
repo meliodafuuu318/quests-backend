@@ -6,6 +6,8 @@ use App\Repositories\BaseRepository;
 use App\Models\{
     Friend,
     SocialActivity,
+    User,
+    Media
 };
 use Illuminate\Support\Facades\DB;
 
@@ -105,16 +107,19 @@ class IndexPostsRepository extends BaseRepository
 
         // Attach creator info + media to each post
         $paginated->getCollection()->transform(function ($post) use ($userId) {
-            $user   = \App\Models\User::find($post->user_id);
-            $media  = \App\Models\Media::where('social_activity_id', $post->id)->get()
+            $user = User::find($post->user_id);
+            $media = Media::where('social_activity_id', $post->id)->get()
                         ->map(fn($m) => ['filepath' => $m->filepath])->values();
+                        
+            $post->id = $post->id;  // ensure top-level id
+            $post->creator_username = $user?->username;
+            $post->creator_full_name = ($user?->first_name ?? '') . ' ' . ($user?->last_name ?? '');
+            $post->visibility = $post->visibility;
+            $post->liked = (bool) $post->liked;
+            $post->media = $media;
+            $post->created_at = $post->created_at->format('Y-m-d h:i');
+            $post->created_at = $post->created_at->format('Y-m-d h:i');
 
-            $post->id                  = $post->id;  // ensure top-level id
-            $post->creator_username    = $user?->username;
-            $post->creator_full_name   = ($user?->first_name ?? '') . ' ' . ($user?->last_name ?? '');
-            $post->visibility          = $post->visibility;
-            $post->liked               = (bool) $post->liked;
-            $post->media               = $media;
             return $post;
         });
 

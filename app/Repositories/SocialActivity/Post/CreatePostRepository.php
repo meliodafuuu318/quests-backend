@@ -4,12 +4,7 @@ namespace App\Repositories\SocialActivity\Post;
 
 use App\Repositories\BaseRepository;
 use App\Models\{
-    User,
-    SocialActivity,
-    Quest,
-    QuestTask,
-    Friend,
-    Media
+    User, SocialActivity, Quest, QuestTask, Friend, Media, Notification
 };
 use App\Events\PostEvent;
 use Illuminate\Support\Facades\DB;
@@ -19,95 +14,71 @@ class CreatePostRepository extends BaseRepository
     public function execute($request)
     {
         $user = User::find(auth()->user()->id);
-
         DB::beginTransaction();
-
         if ($request->type === 'post') {
             try {
                 $post = SocialActivity::create([
-                    'user_id' => $user->id,
-                    'type' => 'post',
-                    'title' => $request->title,
-                    'content' => $request->content,
+                    'user_id'    => $user->id,
+                    'type'       => 'post',
+                    'title'      => $request->title,
+                    'content'    => $request->content,
                     'visibility' => $request->visibility,
                 ]);
 
-                // ── Media uploads ─────────────────────────────────────────────
-                // file('media') returns an array when the field name is 'media[]'
-                // (Flutter's multipart), or a single UploadedFile when it's 'media'.
-                // We normalise to array so the foreach always works safely.
                 if ($request->hasFile('media')) {
                     $files = $request->file('media');
-                    if (!is_array($files)) {
-                        $files = [$files];
-                    }
-
+                    if (!is_array($files)) $files = [$files];
                     foreach ($files as $file) {
                         $filePath = $file->storeAs(
                             'media/' . now()->format('Y-m-d'),
                             'upload-' . $user->username . '-' . uniqid() . '.' . $file->extension(),
                             'public'
                         );
-                        Media::create([
-                            'filepath' => '/storage/' . $filePath,
-                            'user_id' => $user->id,
-                            'social_activity_id' => $post->id,
-                        ]);
+                        Media::create(['filepath' => '/storage/' . $filePath, 'user_id' => $user->id, 'social_activity_id' => $post->id]);
                     }
                 }
 
                 $quest = Quest::create([
-                    'code' => $this->questCode(),
-                    'post_id' => $post->id,
-                    'creator_id' => $user->id,
-                    'reward_exp' => $request->rewardExp,
-                    'reward_points' => $request->rewardPoints,
+                    'code' => $this->questCode(), 'post_id' => $post->id, 'creator_id' => $user->id,
+                    'reward_exp' => $request->rewardExp, 'reward_points' => $request->rewardPoints,
                 ]);
 
                 foreach ($request->tasks as $task) {
                     QuestTask::create([
-                        'quest_id' => $quest->id,
-                        'title' => $task['title'],
-                        'description' => $task['description'],
-                        'reward_exp' => $task['rewardExp'],
-                        'reward_points' => $task['rewardPoints'],
-                        'order' => $task['order'],
+                        'quest_id' => $quest->id, 'title' => $task['title'], 'description' => $task['description'],
+                        'reward_exp' => $task['rewardExp'], 'reward_points' => $task['rewardPoints'], 'order' => $task['order'],
+                    ]);
+                }
+
+                $friendIds = Friend::where(function ($q) use ($user) {
+                        $q->where('user_id', $user->id)->orWhere('friend_id', $user->id);
+                    })
+                    ->where('status', 'friend')->get()
+                    ->map(fn($f) => $f->user_id === $user->id ? $f->friend_id : $f->user_id)
+                    ->values()->toArray();
+
+                $notifyFriends = in_array($post->visibility, ['public', 'friends']) ? $friendIds : [];
+
+                // Persist DB notifications for each friend
+                foreach ($notifyFriends as $friendId) {
+                    Notification::create([
+                        'user_id' => $friendId,
+                        'type'    => 'new_post',
+                        'title'   => $user->username . ' posted a new quest',
+                        'body'    => $post->title ?? '',
+                        'post_id' => $post->id,
                     ]);
                 }
 
                 DB::commit();
 
-                // ── Broadcast ─────────────────────────────────────────────────
-                $friendIds = Friend::where(function ($q) use ($user) {
-                        $q->where('user_id', $user->id)
-                          ->orWhere('friend_id', $user->id);
-                    })
-                    ->where('status', 'friend')
-                    ->get()
-                    ->map(fn($f) => $f->user_id === $user->id ? $f->friend_id : $f->user_id)
-                    ->values()
-                    ->toArray();
+                event(new PostEvent([
+                    'id' => $post->id, 'title' => $post->title,
+                    'username' => $user->username, 'visibility' => $post->visibility,
+                    'is_friend' => true, 'created_at' => $post->created_at->toIso8601String(),
+                ], $notifyFriends));
 
-                $broadcastData = [
-                    'id' => $post->id,
-                    'title' => $post->title,
-                    'username' => $user->username,
-                    'visibility' => $post->visibility,
-                    'is_friend' => true,
-                    'created_at' => $post->created_at->toIso8601String(),
-                ];
-
-                $notifyFriends = in_array($post->visibility, ['public', 'friends'])
-                    ? $friendIds
-                    : [];
-
-                event(new PostEvent($broadcastData, $notifyFriends));
-
-                return $this->success('Post created successfully.', [
-                    'post' => $post,
-                    'quest' => $quest,
-                    'tasks' => $quest->questTask,
-                ], 200);
+                return $this->success('Post created successfully.', ['post' => $post, 'quest' => $quest, 'tasks' => $quest->questTask], 200);
 
             } catch (\Exception $e) {
                 DB::rollback();

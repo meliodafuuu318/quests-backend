@@ -16,6 +16,10 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->string('title');
+            $table->string('type')->default('info');
+            $table->string('body')->nullable();
+            $table->unsignedBigInteger('post_id')->nullable();
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
     }

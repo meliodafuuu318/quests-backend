@@ -8,16 +8,24 @@ class Notification extends Model
 {
     protected $fillable = [
         'user_id',
-        'title'
+        'type',
+        'title',
+        'body',
+        'post_id',
+        'read_at',
     ];
 
-    protected $hidden = [
-        'id',
-        'created_at',
-        'updated_at'
+    protected $casts = [
+        'read_at' => 'datetime',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function isRead(): bool
+    {
+        return $this->read_at !== null;
     }
 }

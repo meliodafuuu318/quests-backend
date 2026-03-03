@@ -6,7 +6,8 @@ use App\Repositories\BaseRepository;
 use App\Models\{
     User,
     SocialActivity,
-    Media
+    Media,
+    Notification
 };
 use App\Events\CommentEvent;
 use Illuminate\Support\Facades\DB;
@@ -29,23 +30,18 @@ class CreateCommentRepository extends BaseRepository
                     return $this->error('Post not found', 404);
                 }
 
-                // content is nullable — a media-only comment is allowed.
                 $comment = SocialActivity::create([
-                    'user_id' => $user->id,
-                    'visibility' => 'public',
-                    'type' => 'comment',
+                    'user_id'        => $user->id,
+                    'visibility'     => 'public',
+                    'type'           => 'comment',
                     'comment_target' => $request->commentTarget,
-                    'content' => $request->content ?? null,
+                    'content'        => $request->content ?? null,
                 ]);
 
                 // ── Media uploads ─────────────────────────────────────────────
-                // Normalise to array so foreach works whether Flutter sent
-                // 'media[]' (array) or the field arrives as a single file.
                 if ($request->hasFile('media')) {
                     $files = $request->file('media');
-                    if (!is_array($files)) {
-                        $files = [$files];
-                    }
+                    if (!is_array($files)) $files = [$files];
 
                     foreach ($files as $file) {
                         $filePath = $file->storeAs(
@@ -54,13 +50,23 @@ class CreateCommentRepository extends BaseRepository
                             'public'
                         );
                         Media::create([
-                            'filepath' => '/storage/' . $filePath,
-                            'user_id' => $user->id,
-                            // Link to THIS comment's social_activity id so
-                            // ShowPostCommentsRepository can fetch them back.
+                            'filepath'           => '/storage/' . $filePath,
+                            'user_id'            => $user->id,
                             'social_activity_id' => $comment->id,
                         ]);
                     }
+                }
+
+                // ── Persist notification for post owner ───────────────────────
+                $postOwnerId = $post->user_id;
+                if ($postOwnerId !== $user->id) {
+                    Notification::create([
+                        'user_id' => $postOwnerId,
+                        'type'    => 'new_comment',
+                        'title'   => $user->username . ' commented on your post',
+                        'body'    => $comment->content ?? '(media)',
+                        'post_id' => $post->id,
+                    ]);
                 }
 
                 DB::commit();
@@ -71,14 +77,14 @@ class CreateCommentRepository extends BaseRepository
                     ->count();
 
                 event(new CommentEvent([
-                    'post_id' => $post->id,
+                    'post_id'       => $post->id,
                     'post_owner_id' => $post->user_id,
-                    'commenter_id' => $user->id,
-                    'username' => $user->username,
-                    'content' => $comment->content,
+                    'commenter_id'  => $user->id,
+                    'username'      => $user->username,
+                    'content'       => $comment->content,
                     'comment_count' => $commentCount,
-                    'created_at' => $comment->created_at->toIso8601String(),
-                    'has_media' => $request->hasFile('media'),
+                    'created_at'    => $comment->created_at->toIso8601String(),
+                    'has_media'     => $request->hasFile('media'),
                 ]));
 
                 return $this->success('Comment created successfully', $comment, 200);

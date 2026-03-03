@@ -9,7 +9,8 @@ use Database\Seeders\{
     RoleSeeder,
     UserSeeder,
     SocialActivitySeeder,
-    FriendSeeder
+    FriendSeeder,
+    MediaSeeder
 };
 
 class DatabaseSeeder extends Seeder
@@ -32,7 +33,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             SocialActivitySeeder::class,
-            FriendSeeder::class
+            FriendSeeder::class,
+            MediaSeeder::class
         ]);
     }
 }

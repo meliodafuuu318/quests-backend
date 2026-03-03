@@ -17,9 +17,9 @@ return new class extends Migration
     {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
-            $table->string('filepath')->unique();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(SocialActivity::class)->constrained()->cascadeOnDelete();
+            $table->string('filepath');
+            $table->foreignIdFor(User::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(SocialActivity::class)->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

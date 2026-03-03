@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     UserController,
     SocialActivityController,
     QuestController,
+    NotificationController
 };
 
 Route::get('/user', function (Request $request) {
@@ -80,3 +81,13 @@ Route::group([
 });
 
 Route::post('/upload-media', [SocialActivityController::class, 'uploadMedia'])->middleware('auth:sanctum');
+
+Route::group([
+    'prefix' => 'notifications',
+    'middleware' => 'auth:sanctum'
+], function ($route) {
+    $route->get('/', [NotificationController::class, 'index']);
+    $route->post('/read', [NotificationController::class, 'markRead']);
+    // POST /notifications/read with body {"all": true}          → mark all read
+    // POST /notifications/read with body {"notificationId": 5}  → mark one read
+});

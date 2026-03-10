@@ -5,6 +5,7 @@ namespace App\Repositories\User\User;
 use App\Repositories\BaseRepository;
 
 use App\Models\User;
+use App\Http\Resources\UserResource;
 
 class GetAccountInfoRepository extends BaseRepository
 {
@@ -15,6 +16,6 @@ class GetAccountInfoRepository extends BaseRepository
             return $this->error('User not found', 404);
         }
 
-        return $this->success('User info fetched successfully', $user, 200);
+        return $this->success('User info fetched successfully', new UserResource($user), 200);
     }
 }

@@ -10,7 +10,8 @@ use Database\Seeders\{
     UserSeeder,
     SocialActivitySeeder,
     FriendSeeder,
-    MediaSeeder
+    MediaSeeder,
+    AssetSeeder
 };
 
 class DatabaseSeeder extends Seeder
@@ -31,10 +32,11 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
+            AssetSeeder::class,
             UserSeeder::class,
             SocialActivitySeeder::class,
             FriendSeeder::class,
-            MediaSeeder::class
+            MediaSeeder::class,
         ]);
     }
 }

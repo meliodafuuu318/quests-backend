@@ -7,6 +7,7 @@ use App\Models\{
     User,
     Friend
 };
+use App\Http\Resources\UserResource;
 
 class ShowUserRepository extends BaseRepository
 {
@@ -31,6 +32,6 @@ class ShowUserRepository extends BaseRepository
             return $this->error('User not found', 404);
         }
 
-        return $this->success('User details fetched successfully', $user, 200);
+        return $this->success('User details fetched successfully', new UserResource($user), 200);
     }
 }

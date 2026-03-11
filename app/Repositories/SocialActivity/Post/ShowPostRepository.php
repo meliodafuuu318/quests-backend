@@ -6,9 +6,10 @@ use App\Repositories\BaseRepository;
 use App\Models\{
     SocialActivity,
     QuestTask,
-    Media
+    Media,
+    Asset,
+    Quest
 };
-use App\Http\Resources\PostResource;
 
 class ShowPostRepository extends BaseRepository
 {
@@ -42,23 +43,54 @@ class ShowPostRepository extends BaseRepository
             ->map(fn($m) => ['filepath' => $m->filepath, 'id' => $m->id])
             ->values();
 
-        $postData = new PostResource($post);
-        $result   = $postData->toArray($request);
-
         $avatarUrl = null;
-        $creator   = $post->user;
+        $creator = $post->user;
         if ($creator && $creator->avatar_id) {
-            $asset     = Asset::find($creator->avatar_id);
+            $asset = Asset::find($creator->avatar_id);
             $avatarUrl = $asset?->filepath;
         }
 
-        // Inject extra fields the Flutter app needs
-        $result['id']  = $post->id;
-        $result['liked'] = $liked;
-        $result['likes_count'] = $likesCount;
-        $result['comments_count'] = $commentsCount;
-        $result['media'] = $media;
-        $result['creator_avatar_url'] = $avatarUrl;
+        $quest = Quest::where('post_id', $post->id)->first();
+        $questData = null;
+        if ($quest) {
+            $tasks = QuestTask::where('quest_id', $quest->id)
+                ->orderBy('order')
+                ->get()
+                ->map(fn($t) => [
+                    'order' => $t->order,
+                    'title' => $t->title,
+                    'description' => $t->description,
+                    'reward_exp' => $t->reward_exp,
+                    'reward_points' => $t->reward_points,
+                ]);
+            $questData = [
+                'id' => $quest->id,
+                'code' => $quest->code,
+                'reward_exp' => $quest->reward_exp,
+                'reward_points' => $quest->reward_points,
+                'participants' => $quest->participant_count,
+                'quest_tasks' => $tasks,
+            ];
+        }
+
+        $result = [
+            'id' => $post->id,
+            'user_id' => $post->user_id,
+            'type' => $post->type,
+            'visibility' => $post->visibility,
+            'title' => $post->title,
+            'content' => $post->content,
+            'created_at' => optional($post->created_at)->format('Y-m-d h:i'),
+            'updated_at' => optional($post->updated_at)->format('Y-m-d h:i'),
+            'liked' => $liked,
+            'likes_count' => $likesCount,
+            'comments_count' => $commentsCount,
+            'media' => $media,
+            'creator_username' => $creator?->username,
+            'creator_full_name' => trim(($creator?->first_name ?? '') . ' ' . ($creator?->last_name ?? '')),
+            'creator_avatar_url' => $avatarUrl,
+            'quest' => $questData,
+        ];
 
         return $this->success('Post fetched successfully', $result, 200);
     }

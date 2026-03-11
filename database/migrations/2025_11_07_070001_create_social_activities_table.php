@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('content')->nullable();
             $table->integer('comment_target')->nullable();
             $table->integer('like_target')->nullable();
+            $table->boolean('verification_submission')->default(false);
             $table->timestamps();
         });
     }

@@ -23,7 +23,7 @@ class CompleteTaskRepository extends BaseRepository
             return $this->error('Task not found', 404);
         }
 
-        if (($task->questParticipant->user_id === auth()->id())&&($task->completion_status === null)) {
+        if (($task->questParticipant->user_id === auth()->id()) && ($task->completion_status === null)) {
             $request->validate([
                 'file' => 'required|file'
             ]);
@@ -34,8 +34,10 @@ class CompleteTaskRepository extends BaseRepository
                 'visibility' => 'public',
                 'content' => 'Task: ' . $task->questTask->title . ' completed.',
                 'comment_target' => $task->questTask->quest->socialActivity->id,
+                'verification_submission' => true,   // ← marks this as a verification comment
             ]);
 
+            $proof = null;
             if ($request->has('file')) {
                 $file = $request->file;
                 $filePath = $file->storeAs(
@@ -47,52 +49,57 @@ class CompleteTaskRepository extends BaseRepository
                 $proof = Media::create([
                     'filepath' => '/storage/' . $filePath,
                     'user_id' => auth()->id(),
-                    'social_activity_id' => $completionComment->id
+                    'social_activity_id' => $completionComment->id,
                 ]);
             }
 
             $task->update([
                 'completion_status' => 'submitted',
-                'completed_at' => Carbon::now()
+                'completed_at' => Carbon::now(),
             ]);
 
-            $data = [
+            return $this->success('Task completion submitted for approval', [
                 'task' => $task,
-                'proof' => $proof
-            ];
+                'proof' => $proof,
+            ], 200);
 
-            return $this->success('Task completion submitted for approval', $data, 200);
-
-        } elseif (($task->questParticipant->user_id === auth()->id())&&($task->completion_status !== null)) {
-
+        } elseif (($task->questParticipant->user_id === auth()->id()) && ($task->completion_status !== null)) {
             return $this->error('Task completion already submitted', 401);
 
         } else {
+            // ── Quest creator approves ────────────────────────────────────────
             if (auth()->id() === $task->questTask->quest->creator_id) {
                 if (isset($request->approve)) {
-                    $approvalExists = $task->completion_status === 'completed' || CompletionVerification::where('user_id', auth()->id())->where('quest_participant_task_id', $task->id)->exists();
+                    $approvalExists = $task->completion_status === 'completed'
+                        || CompletionVerification::where('user_id', auth()->id())
+                            ->where('quest_participant_task_id', $task->id)
+                            ->exists();
+
                     if ($approvalExists) {
                         return $this->error('Submission already approved');
                     }
+
                     if ($task->completion_status === 'community_verified') {
                         CompletionVerification::create([
                             'type' => 'verification',
                             'user_id' => auth()->id(),
-                            'quest_participant_task_id' => $task->id
+                            'quest_participant_task_id' => $task->id,
                         ]);
+
                         $task->update([
                             'completion_status' => 'completed',
-                            'approved_at' => Carbon::now()
+                            'approved_at' => Carbon::now(),
                         ]);
 
                         $questParticipant = $task->questParticipant;
-                        $participantUser = User::find($questParticipant->user_id);
-
+                        $participantUser  = User::find($questParticipant->user_id);
                         $participantUser->update([
-                            'exp' => $participantUser->exp + $task->questTask->reward_exp
+                            'exp' => $participantUser->exp + $task->questTask->reward_exp,
                         ]);
-                        $points = floatval($task->questTask->reward_points);
-                        $participantUser->creditAdd($points, 'Completed task');
+                        $participantUser->creditAdd(
+                            floatval($task->questTask->reward_points),
+                            'Completed task'
+                        );
 
                         return $this->success('Task completion approved', [], 200);
                     } else {
@@ -120,29 +127,29 @@ class CompleteTaskRepository extends BaseRepository
                     $verify = CompletionVerification::create([
                         'type' => 'verification',
                         'user_id' => auth()->id(),
-                        'quest_participant_task_id' => $task->id
+                        'quest_participant_task_id' => $task->id,
                     ]);
 
-                    if (($verifies > 5)&&($verifies > $task->flags)&&($task->completion_status !== 'completed')) {
-                        $task->update([
-                            'completion_status' => 'community_verified'
-                        ]);
+                    if (($verifies > 5) && ($verifies > $flags) && ($task->completion_status !== 'completed')) {
+                        $task->update(['completion_status' => 'community_verified']);
                     }
                 } elseif ($request->flag) {
                     $flag = CompletionVerification::create([
                         'type' => 'flag',
                         'user_id' => auth()->id(),
-                        'quest_participant_task_id' => $task->id
+                        'quest_participant_task_id' => $task->id,
                     ]);
 
-                    if (($flags > 5)&&($verifies <= $flags)&&($task->completion_status !== 'completed')) {
-                        $task->update([
-                            'completion_status' => 'flagged'
-                        ]);
+                    if (($flags > 5) && ($verifies <= $flags) && ($task->completion_status !== 'completed')) {
+                        $task->update(['completion_status' => 'flagged']);
                     }
                 }
 
-                return $this->success('Completion verification/flag submitted', $verify ?? $flag ?? null, 200);
+                return $this->success(
+                    'Completion verification/flag submitted',
+                    $verify ?? $flag ?? null,
+                    200
+                );
             }
         }
     }

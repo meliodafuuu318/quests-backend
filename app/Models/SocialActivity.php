@@ -22,6 +22,7 @@ class SocialActivity extends Model
         'content',
         'comment_target',
         'like_target',
+        'verification_submission',
         'created_at',
         'updated_at',
     ];

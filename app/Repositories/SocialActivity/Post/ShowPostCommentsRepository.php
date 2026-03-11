@@ -6,9 +6,9 @@ use App\Repositories\BaseRepository;
 use App\Models\{
     SocialActivity,
     Media,
+    QuestParticipant,
     QuestParticipantTask,
-    CompletionVerification,
-    QuestParticipant
+    CompletionVerification
 };
 
 class ShowPostCommentsRepository extends BaseRepository
@@ -32,18 +32,20 @@ class ShowPostCommentsRepository extends BaseRepository
             ->orderBy('created_at', 'asc')
             ->paginate(20);
 
-        $transformed = $postComments->getCollection()->map(function ($comment) use ($userId) {
+        $transformed = $postComments->getCollection()->map(function ($comment) use ($userId, $post) {
             $media = Media::where('social_activity_id', $comment->id)
                 ->get()
                 ->map(fn($m) => ['filepath' => $m->filepath])
                 ->values();
 
-            $isVerification = (bool) $comment->verification_submission;
+            // MySQL tinyint(1) comes back as int 0/1 in PHP — cast properly
+            $isVerification = (int) $comment->verification_submission === 1;
 
-            $completionStatus = null;
-            $approveCount = 0;
-            $flagCount = 0;
-            $myVote = null;
+            // For verification submissions, pull task status + vote counts
+            $completionStatus     = null;
+            $approveCount         = 0;
+            $flagCount            = 0;
+            $myVote               = null; // 'approved' | 'flagged' | null
             $questParticipantTaskId = null;
 
             if ($isVerification) {
@@ -52,6 +54,8 @@ class ShowPostCommentsRepository extends BaseRepository
                     ->first();
 
                 if ($participant) {
+                    // Pick the task that was submitted most recently by this participant
+                    // whose completion comment content matches (best-effort: just grab submitted/later)
                     $task = QuestParticipantTask::where('quest_participant_id', $participant->id)
                         ->whereNotNull('completion_status')
                         ->orderBy('completed_at', 'desc')
@@ -81,17 +85,18 @@ class ShowPostCommentsRepository extends BaseRepository
             }
 
             return [
-                'id' => $comment->id,
-                'username' => $comment->user->username,
-                'postId' => $comment->comment_target,
-                'content' => $comment->content,
-                'media' => $media,
-                'createdAt' => $comment->created_at->format('Y-m-d h:i'),
-                'is_verification' => $isVerification,
-                'completion_status' => $completionStatus,
-                'approve_count' => $approveCount,
-                'flag_count' => $flagCount,
-                'my_vote' => $myVote,
+                'id'                       => $comment->id,
+                'username'                 => $comment->user->username,
+                'postId'                   => $comment->comment_target,
+                'content'                  => $comment->content,
+                'media'                    => $media,
+                'createdAt'                => $comment->created_at->format('Y-m-d h:i'),
+                // verification fields
+                'is_verification'          => $isVerification,
+                'completion_status'        => $completionStatus,
+                'approve_count'            => $approveCount,
+                'flag_count'               => $flagCount,
+                'my_vote'                  => $myVote,        // null | 'approved' | 'flagged'
                 'quest_participant_task_id' => $questParticipantTaskId,
             ];
         });

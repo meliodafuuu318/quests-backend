@@ -23,23 +23,30 @@ class CompleteTaskRepository extends BaseRepository
             return $this->error('Task not found', 404);
         }
 
+        // ── Participant submitting their own task ─────────────────────────────
         if (($task->questParticipant->user_id === auth()->id()) && ($task->completion_status === null)) {
             $request->validate([
                 'file' => 'required|file'
             ]);
 
+            $questPost = $task->questTask->quest->socialActivity;
+            if (!$questPost) {
+                return $this->error('Quest post not found', 404);
+            }
+
+            // Create the verification submission comment with the flag set
             $completionComment = SocialActivity::create([
-                'user_id' => auth()->id(),
-                'type' => 'comment',
-                'visibility' => 'public',
-                'content' => 'Task: ' . $task->questTask->title . ' completed.',
-                'comment_target' => $task->questTask->quest->socialActivity->id,
+                'user_id'                 => auth()->id(),
+                'type'                    => 'comment',
+                'visibility'              => 'public',
+                'content'                 => 'Task: ' . $task->questTask->title . ' completed.',
+                'comment_target'          => $questPost->id,
                 'verification_submission' => true,   // ← marks this as a verification comment
             ]);
 
             $proof = null;
             if ($request->has('file')) {
-                $file = $request->file;
+                $file     = $request->file;
                 $filePath = $file->storeAs(
                     'media/' . Carbon::now()->format('Y/m/d'),
                     'upload-' . auth()->user()->username . '-' . uniqid() . '.' . $file->extension(),
@@ -47,19 +54,19 @@ class CompleteTaskRepository extends BaseRepository
                 );
 
                 $proof = Media::create([
-                    'filepath' => '/storage/' . $filePath,
-                    'user_id' => auth()->id(),
+                    'filepath'           => '/storage/' . $filePath,
+                    'user_id'            => auth()->id(),
                     'social_activity_id' => $completionComment->id,
                 ]);
             }
 
             $task->update([
                 'completion_status' => 'submitted',
-                'completed_at' => Carbon::now(),
+                'completed_at'      => Carbon::now(),
             ]);
 
             return $this->success('Task completion submitted for approval', [
-                'task' => $task,
+                'task'  => $task,
                 'proof' => $proof,
             ], 200);
 
@@ -81,14 +88,14 @@ class CompleteTaskRepository extends BaseRepository
 
                     if ($task->completion_status === 'community_verified') {
                         CompletionVerification::create([
-                            'type' => 'verification',
-                            'user_id' => auth()->id(),
+                            'type'                      => 'verification',
+                            'user_id'                   => auth()->id(),
                             'quest_participant_task_id' => $task->id,
                         ]);
 
                         $task->update([
                             'completion_status' => 'completed',
-                            'approved_at' => Carbon::now(),
+                            'approved_at'       => Carbon::now(),
                         ]);
 
                         $questParticipant = $task->questParticipant;
@@ -107,6 +114,7 @@ class CompleteTaskRepository extends BaseRepository
                     }
                 }
             } else {
+                // ── Community verify or flag ──────────────────────────────────
                 $verifies = CompletionVerification::where('quest_participant_task_id', $task->id)
                     ->where('type', 'verification')
                     ->count();
@@ -125,8 +133,8 @@ class CompleteTaskRepository extends BaseRepository
 
                 if ($request->verify) {
                     $verify = CompletionVerification::create([
-                        'type' => 'verification',
-                        'user_id' => auth()->id(),
+                        'type'                      => 'verification',
+                        'user_id'                   => auth()->id(),
                         'quest_participant_task_id' => $task->id,
                     ]);
 
@@ -135,8 +143,8 @@ class CompleteTaskRepository extends BaseRepository
                     }
                 } elseif ($request->flag) {
                     $flag = CompletionVerification::create([
-                        'type' => 'flag',
-                        'user_id' => auth()->id(),
+                        'type'                      => 'flag',
+                        'user_id'                   => auth()->id(),
                         'quest_participant_task_id' => $task->id,
                     ]);
 

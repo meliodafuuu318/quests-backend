@@ -108,6 +108,12 @@ class IndexPostsRepository extends BaseRepository
         // Attach creator info + media to each post
         $paginated->getCollection()->transform(function ($post) use ($userId) {
             $user = User::find($post->user_id);
+            $avatarUrl = null;
+            if ($user && $user->avatar_id) {
+                $asset = Asset::find($user->avatar_id);
+                $avatarUrl = asset($asset?->filepath);
+            }
+            $post->creator_avatar_url = $avatarUrl;
             $media = Media::where('social_activity_id', $post->id)->get()
                         ->map(fn($m) => ['filepath' => $m->filepath])->values();
                         

@@ -45,12 +45,20 @@ class ShowPostRepository extends BaseRepository
         $postData = new PostResource($post);
         $result   = $postData->toArray($request);
 
+        $avatarUrl = null;
+        $creator   = $post->user;
+        if ($creator && $creator->avatar_id) {
+            $asset     = Asset::find($creator->avatar_id);
+            $avatarUrl = $asset?->filepath;
+        }
+
         // Inject extra fields the Flutter app needs
         $result['id']  = $post->id;
         $result['liked'] = $liked;
         $result['likes_count'] = $likesCount;
         $result['comments_count'] = $commentsCount;
         $result['media'] = $media;
+        $result['creator_avatar_url'] = $avatarUrl;
 
         return $this->success('Post fetched successfully', $result, 200);
     }

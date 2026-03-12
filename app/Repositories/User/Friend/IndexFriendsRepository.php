@@ -16,10 +16,14 @@ class IndexFriendsRepository extends BaseRepository
         $friends = Friend::where('status', 'friend')
             ->where('user_id', $user->id)
             ->orWhere('friend_id', $user->id)
+            ->whereNotIn('status', ['blocked'])
             ->get();
 
         $blocked = Friend::where('status', 'blocked')
-            ->where('user_id', $user->id)
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->orWhere('friend_id', $user->id);
+            })
             ->get();
 
         $transformedFriends = $friends->map(function ($friend) use ($user) {
@@ -35,8 +39,13 @@ class IndexFriendsRepository extends BaseRepository
         });
 
         $transformedBlocked = $blocked->map(function ($block) use ($user) {
+            if ($user->id === $block->user_id) {
+                $username = $block->friend->username;
+            } elseif ($user->id === $block->friend_id) {
+                $username = $block->user->username;
+            }
             return [
-                'username' => $block->friend->username,
+                'username' => $username,
                 'blockedSince' => $block->updated_at
             ];
         });

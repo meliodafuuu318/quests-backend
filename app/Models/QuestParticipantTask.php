@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\{
     QuestParticipant,
     QuestTask,
-    CompletionVerification
+    CompletionVerification,
+    SocialActivity
 };
 
 class QuestParticipantTask extends Model
@@ -15,6 +16,7 @@ class QuestParticipantTask extends Model
         'quest_participant_id',
         'quest_task_id',
         'completion_status',
+        'completion_comment_id',
         'completed_at',
         'approved_at'
     ];
@@ -38,5 +40,9 @@ class QuestParticipantTask extends Model
 
     public function completionVerification() {
         return $this->hasMany(CompletionVerification::class, 'quest_participant_task_id');
+    }
+
+    public function completionComment() {
+        return $this->hasOne(SocialActivity::class, 'completion_comment_id');
     }
 }

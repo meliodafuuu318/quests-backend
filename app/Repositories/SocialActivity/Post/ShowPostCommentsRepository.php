@@ -58,8 +58,7 @@ class ShowPostCommentsRepository extends BaseRepository
                     // whose completion comment content matches (best-effort: just grab submitted/later)
                     $task = QuestParticipantTask::where('quest_participant_id', $participant->id)
                         ->whereNotNull('completion_status')
-                        ->orderBy('completed_at', 'desc')
-                        ->first();
+                        ->orderBy('completed_at', 'desc');
 
                     if ($task) {
                         $questParticipantTaskId = $task->id;

@@ -38,4 +38,8 @@ class SocialActivity extends Model
     public function media() {
         return $this->hasMany(Media::class, 'social_activity_id');
     }
+
+    public function questTask() {
+        return $this->belongsTo(QuestParticipantTask::class, 'completion_comment_id');
+    }
 }

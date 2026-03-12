@@ -63,6 +63,7 @@ class CompleteTaskRepository extends BaseRepository
             $task->update([
                 'completion_status' => 'submitted',
                 'completed_at'      => Carbon::now(),
+                'completion_comment_id' => $completionComment->id,
             ]);
 
             return $this->success('Task completion submitted for approval', [

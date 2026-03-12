@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(QuestTask::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(QuestParticipant::class)->constrained()->cascadeOnDelete();
             $table->enum('completion_status', ['submitted', 'community_verified', 'flagged', 'completed'])->nullable();
+            $table->foreignId('completion_comment_id')->nullable()->constrained('social_activities')->nullOnDelete();
             $table->datetime('completed_at')->nullable();
             $table->datetime('approved_at')->nullable();
             $table->timestamps();

@@ -99,6 +99,7 @@ class ShowPostCommentsRepository extends BaseRepository
                 'flag_count'               => $flagCount,
                 'my_vote'                  => $myVote,        // null | 'approved' | 'flagged'
                 'quest_participant_task_id' => $questParticipantTaskId,
+                'comment_avatar_url'       => $comment->user->avatar->filepath,
             ];
         });
 

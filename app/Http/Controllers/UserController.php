@@ -87,7 +87,7 @@ class UserController extends Controller
         return $this->acceptFriendRequest->execute($request);
     }
 
-    public function indexFriendRequests() {
+    public function indexFriendRequests(Request $request) {
         return $this->indexFriendRequests->execute($request);
     }
 

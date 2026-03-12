@@ -12,7 +12,7 @@ use App\Http\Resources\UserResource;
 class ShowUserRepository extends BaseRepository
 {
     public function execute($request){
-        $user = User::find(auth()->user()->id);
+        $user = User::find(auth()->id());
         $targetUser = User::where('username', $request->username)->first();
 
         $blockExists = Friend::where(function ($self) use ($user) {

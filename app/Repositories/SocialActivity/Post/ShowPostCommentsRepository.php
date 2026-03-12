@@ -57,8 +57,10 @@ class ShowPostCommentsRepository extends BaseRepository
                     // Pick the task that was submitted most recently by this participant
                     // whose completion comment content matches (best-effort: just grab submitted/later)
                     $task = QuestParticipantTask::where('quest_participant_id', $participant->id)
+                        ->where('completion_comment_id', $comment->id)
                         ->whereNotNull('completion_status')
-                        ->orderBy('completed_at', 'desc');
+                        ->orderBy('completed_at', 'desc')
+                        ->first();
 
                     if ($task) {
                         $questParticipantTaskId = $task->id;

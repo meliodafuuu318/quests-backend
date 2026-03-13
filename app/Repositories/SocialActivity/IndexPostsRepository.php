@@ -139,12 +139,8 @@ class IndexPostsRepository extends BaseRepository
             $post->media = $media;
             $post->quest = $questData;
 
-            $post->created_at = $post->created_at instanceof Carbon
-                ? $post->created_at->format('Y-m-d h:i')
-                : substr((string) $post->created_at, 0, 16);
-            $post->updated_at = $post->updated_at instanceof Carbon
-                ? $post->updated_at->format('Y-m-d h:i')
-                : substr((string) $post->updated_at, 0, 16);
+            $post->created_at = $post->created_at->format('Y-m-d H:i:s');
+            $post->updated_at = $post->updated_at->format('Y-m-d H:i:s');
 
             return $post;
         });

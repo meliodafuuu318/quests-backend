@@ -11,6 +11,7 @@ use App\Models\{
     QuestParticipantTask
 };
 use Carbon\Carbon;
+use App\Events\JoinQuestEvent;
 
 class JoinQuestRepository extends BaseRepository
 {
@@ -50,6 +51,25 @@ class JoinQuestRepository extends BaseRepository
         ]);
 
         $user->creditDeduct(25.00, 'Joined quest');
+
+        event(new JoinQuestEvent([
+            'participant_id' => $user->id,
+            'participant_username' => $user->username,
+            'creator_id' => $quest->creator_id,
+            'quest_id' => $quest->id,
+            'quest_code' => $quest->code,
+            'post_id' => $quest->post_id,
+            'reward_exp' => $quest->reward_exp,
+            'reward_points' => $quest->reward_points,
+            'joined_at' => $questParticipant->joined_at->format('Y-m-d H:i:s'),
+            'quest_tasks' => $questTaskModels->map(fn($t) => [
+                'order' => $t->order,
+                'title' => $t->title,
+                'description' => $t->description,
+                'reward_exp' => $t->reward_exp,
+                'reward_points' => $t->reward_points,
+            ])->values(),
+        ]));
 
         return $this->success('Joined quest successfully', [$questParticipant, $participantQuestTasks], 200);
     }

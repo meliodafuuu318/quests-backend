@@ -11,19 +11,20 @@ use App\Models\{
     CompletionVerification,
     Media
 };
+use App\Events\QuestCompletedEvent;
 use Carbon\Carbon;
 
 class CompleteTaskRepository extends BaseRepository
 {
-    public function execute($request){
-        $task = QuestParticipantTask::where('id', $request->taskId)
-            ->first();
+    public function execute($request)
+    {
+        $task = QuestParticipantTask::where('id', $request->taskId)->first();
 
         if (!$task) {
             return $this->error('Task not found', 404);
         }
 
-        // ── Participant submitting their own task ─────────────────────────────
+        // ── Participant submitting their own task ─────────────────────────
         if (($task->questParticipant->user_id === auth()->id()) && ($task->completion_status === null)) {
             $request->validate([
                 'file' => 'required|file'
@@ -34,14 +35,13 @@ class CompleteTaskRepository extends BaseRepository
                 return $this->error('Quest post not found', 404);
             }
 
-            // Create the verification submission comment with the flag set
             $completionComment = SocialActivity::create([
                 'user_id'                 => auth()->id(),
                 'type'                    => 'comment',
                 'visibility'              => 'public',
                 'content'                 => 'Task: ' . $task->questTask->title . ' completed.',
                 'comment_target'          => $questPost->id,
-                'verification_submission' => true,   // ← marks this as a verification comment
+                'verification_submission' => true,
             ]);
 
             $proof = null;
@@ -61,8 +61,8 @@ class CompleteTaskRepository extends BaseRepository
             }
 
             $task->update([
-                'completion_status' => 'submitted',
-                'completed_at'      => Carbon::now(),
+                'completion_status'     => 'submitted',
+                'completed_at'          => Carbon::now(),
                 'completion_comment_id' => $completionComment->id,
             ]);
 
@@ -75,7 +75,7 @@ class CompleteTaskRepository extends BaseRepository
             return $this->error('Task completion already submitted', 401);
 
         } else {
-            // ── Quest creator approves ────────────────────────────────────────
+            // ── Quest creator approves ────────────────────────────────────
             if (auth()->id() === $task->questTask->quest->creator_id) {
                 if (isset($request->approve)) {
                     $approvalExists = $task->completion_status === 'completed'
@@ -109,13 +109,16 @@ class CompleteTaskRepository extends BaseRepository
                             'Completed task'
                         );
 
+                        // ── Broadcast task completed ──────────────────────
+                        $this->_broadcastProgress($task, $questParticipant, $participantUser->id, 'completed');
+
                         return $this->success('Task completion approved', [], 200);
                     } else {
                         return $this->error('Completion not yet community verified', 401);
                     }
                 }
             } else {
-                // ── Community verify or flag ──────────────────────────────────
+                // ── Community verify or flag ──────────────────────────────
                 $verifies = CompletionVerification::where('quest_participant_task_id', $task->id)
                     ->where('type', 'verification')
                     ->count();
@@ -132,6 +135,9 @@ class CompleteTaskRepository extends BaseRepository
                     return $this->error('Completion submission already verified', 400);
                 }
 
+                $verify = null;
+                $flag   = null;
+
                 if ($request->verify) {
                     $verify = CompletionVerification::create([
                         'type'                      => 'verification',
@@ -141,6 +147,10 @@ class CompleteTaskRepository extends BaseRepository
 
                     if (($verifies > 5) && ($verifies > $flags) && ($task->completion_status !== 'completed')) {
                         $task->update(['completion_status' => 'community_verified']);
+
+                        // ── Broadcast community_verified to participant ────
+                        $questParticipant = $task->questParticipant;
+                        $this->_broadcastProgress($task, $questParticipant, $questParticipant->user_id, 'community_verified');
                     }
                 } elseif ($request->flag) {
                     $flag = CompletionVerification::create([
@@ -151,6 +161,10 @@ class CompleteTaskRepository extends BaseRepository
 
                     if (($flags > 5) && ($verifies <= $flags) && ($task->completion_status !== 'completed')) {
                         $task->update(['completion_status' => 'flagged']);
+
+                        // ── Broadcast flagged to participant ──────────────
+                        $questParticipant = $task->questParticipant;
+                        $this->_broadcastProgress($task, $questParticipant, $questParticipant->user_id, 'flagged');
                     }
                 }
 
@@ -161,5 +175,25 @@ class CompleteTaskRepository extends BaseRepository
                 );
             }
         }
+    }
+
+    /**
+     * Fire QuestCompletedEvent so the participant's quests tab updates in real-time.
+     */
+    private function _broadcastProgress(
+        QuestParticipantTask $task,
+        QuestParticipant     $participant,
+        int                  $participantUserId,
+        string               $newStatus
+    ): void {
+        event(new QuestCompletedEvent([
+            'participant_user_id'    => $participantUserId,
+            'quest_participant_id'   => $participant->id,
+            'quest_id'               => $participant->quest_id,
+            'quest_task_id'          => $task->quest_task_id,
+            'quest_participant_task_id' => $task->id,
+            'completion_status'      => $newStatus,
+            'approved_at'            => $task->approved_at?->toIso8601String(),
+        ]));
     }
 }
